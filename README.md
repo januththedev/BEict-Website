@@ -41,23 +41,38 @@ npm run models    # regenerate the glTF models into public/models/
                                 # textures, HeroScene, JourneyScene, JourneyCanvas
 ```
 
-## The Z-scroll journey
+## The full-site Z-scroll (v2.0.0)
 
-The **Explore** section (`src/components/ScrollJourney.jsx`) replaces a
-conventional 3D gallery: a 400svh scroll track with a **sticky full-viewport
-canvas**. Scrolling dollies the camera down the Z axis (`JourneyScene.jsx`
-keyframed camera rig) through three glTF stations while story panels fade in
-and out in sync (`useScroll` → progress ref, styles set directly to avoid
-framer-motion v13's WAAPI scroll-timeline path):
+The whole site is **one cinematic flight**. Lenis smooth-scrolls a 1500vh
+track behind a single persistent 3D canvas (`src/three/StageCanvas.jsx` +
+`WorldScene.jsx`); the scene palette lerps bright white → deep navy → light.
 
-1. **CPU chip** — explodes (die lifts off substrate) as you approach
-2. **Network globe** — rings spin, nodes pulse
-3. **Database** — disks spread apart
+Chapters (scroll spans in `src/data/content.js → CHAPTERS`):
 
-Fog hides distant stations so each model emerges from the dark. The three.js
-bundle lazy-loads only when the section is approached; the lazy boundary must
-wrap the **whole Canvas** (`JourneyCanvas.jsx`) because R3F renders canvas
-children in a second reconciler where an outer Suspense can't catch them.
+1. **Hero + Identity + Track record** — `setpieces/Workstation.jsx`: procedural
+   laptop / mechanical keyboard / tower with floating 3D name typography that
+   explodes along Z — keycaps become syllabus badges, the tower opens its
+   module plates, and the parts align beside the verified track record.
+2. **Neural Core** — `setpieces/NeuralCore.jsx`: a holographic glass sphere
+   peels layer-by-layer (background → methodology circuits → stats heart),
+   then condenses into an Enroll Now trigger.
+3. **Syllabus Vault** — `setpieces/Vault.jsx`: a server rack ejects three
+   cartridges — Hardware (textured CPU + RAM), Networking (OSI 7-layer stack),
+   Software (code blocks + binary switch array).
+4. **Sri Lanka map** — `setpieces/LankaMap.jsx`: extruded 1,900-point island
+   (`public/models/sri-lanka-main.json`) with six pins at the real Google Maps
+   coordinates of every class hub — clicking a pin or a list entry opens that
+   centre's Maps listing.
+5. **Community** — stat panels over the starfield.
+6. **3D Gallery** — `setpieces/GalleryPlanes.jsx`: the eight class photos as
+   framed planes in a spiral fly-through.
+7. **Soft landing** — the scene fades to white; LMS banner, ad slots, contact
+   and footer return to normal flow.
+
+Gotchas encoded in the code: the lazy boundary wraps the whole Canvas; chapter
+panels write styles from the shared progress MotionValue (no framer
+useTransform styles — WAAPI offset crash); the 3D world reads a plain progress
+ref (React context does not cross the Canvas root).
 
 ## The 3D models
 
@@ -66,9 +81,7 @@ buffers, PBR materials, named node hierarchy) by `npm run models` — no
 modelling tools or extra dependencies.
 
 - `cpu-chip.gltf` — substrate, gold pins, die, heat spreader, capacitors
-  (parts are separate named nodes → scroll-driven explode + hover highlight)
-- `network-globe.gltf` — core sphere, three tilted rings, 8 satellite nodes
-- `database.gltf` — three stacked disks
+  (reused inside the Vault's Hardware cartridge; parts are named nodes)
 
 A procedural environment map (`StudioEnvironment`, three's RoomEnvironment)
 gives the metals reflections with no network assets, and
