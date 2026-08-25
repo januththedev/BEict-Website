@@ -224,6 +224,73 @@ export function texture(key, repeat = [1, 1]) {
 }
 
 /**
+ * Crisp text label as a transparent canvas texture — used for 3D typography,
+ * keycap badges, cartridge and OSI-layer labels (no text dependencies).
+ */
+export function labelTexture(text, { width = 512, height = 128, color = '#ffffff', font = '700 64px Sora, Arial', bg = null, align = 'center' } = {}) {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  if (bg) {
+    ctx.fillStyle = bg
+    const r = Math.min(width, height) * 0.18
+    ctx.beginPath()
+    ctx.roundRect(0, 0, width, height, r)
+    ctx.fill()
+  }
+  ctx.fillStyle = color
+  ctx.font = font
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.fillText(text, align === 'center' ? width / 2 : width * 0.06, height / 2 + 2)
+  const out = new THREE.CanvasTexture(canvas)
+  out.colorSpace = THREE.SRGBColorSpace
+  out.anisotropy = 8
+  out.needsUpdate = true
+  return out
+}
+
+/** Laptop screen: code editor look with the BEICT mark. */
+export function screenTexture() {
+  return cached('screen', (ctx, S) => {
+    const grad = ctx.createLinearGradient(0, 0, 0, S)
+    grad.addColorStop(0, '#0d1b3e')
+    grad.addColorStop(1, '#0a1229')
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, S, S)
+    // code lines
+    const colors = ['#60a5fa', '#34d399', '#f59e0b', '#c084fc', '#7dd3fc']
+    let y = S * 0.09
+    let seed = 5
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647
+      return seed / 2147483647
+    }
+    for (let i = 0; i < 16; i++) {
+      const w = S * (0.15 + rand() * 0.5)
+      ctx.fillStyle = colors[i % colors.length]
+      ctx.globalAlpha = 0.75
+      ctx.fillRect(S * 0.08, y, w, S * 0.022)
+      if (rand() > 0.6) {
+        ctx.fillStyle = '#334155'
+        ctx.fillRect(S * 0.08, y + S * 0.035, S * 0.3, S * 0.016)
+      }
+      y += S * 0.055
+    }
+    ctx.globalAlpha = 1
+    // BEICT wordmark
+    ctx.fillStyle = '#ffffff'
+    ctx.font = `800 ${S * 0.11}px Sora, Arial`
+    ctx.textAlign = 'center'
+    ctx.fillText('BEICT', S / 2, S * 0.94)
+    ctx.fillStyle = '#38bdf8'
+    ctx.font = `600 ${S * 0.04}px Inter, Arial`
+    ctx.fillText('ICT · A/L · Bhanuka Ekanayaka', S / 2, S * 0.985)
+  }).clone()
+}
+
+/**
  * Apply procedural maps to a loaded model's materials, matched by the
  * generator's material names. Call once per cloned model instance.
  */

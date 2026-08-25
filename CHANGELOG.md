@@ -155,3 +155,39 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
 - Scroll reveals are snappier (0.45 s, smaller offset, trigger earlier via
   viewport margin, stagger halved) so fast scrolling never leaves sections
   looking half-empty.
+
+## [2.0.0] — 2026-08-26 — Full-site Z-scroll
+
+### The whole site is now one cinematic flight
+- **Lenis smooth scrolling** drives the entire page; one persistent 3D stage
+  (fixed canvas) lives behind a 1500vh scroll track. The scene palette lerps
+  bright white → deep navy → light across the journey.
+- **Ch.0–2 Exploding Workstation** — procedural laptop + mechanical keyboard
+  (52 instanced keycaps) + tower with floating 3D name typography. Scrolling
+  explodes it: the monitor pushes back as the bio backdrop, keycaps eject as
+  8 labelled syllabus badges, module plates fan out and align into a grid
+  beside the verified track record (152K FB · 80K YT/332 lessons · 6 hubs ·
+  2026 & 2027 batches — no invented stats).
+- **Ch.3 Neural Core** — holographic glass sphere peels layer-by-layer
+  (background → glowing methodology circuits → stats heart) then condenses
+  into a glowing Enroll Now trigger.
+- **Ch.4 Syllabus Vault** — server rack with BEICT monogram ejects three
+  cartridges: Hardware (textured CPU + RAM sticks), Networking (OSI 7-layer
+  stack), Software (code blocks + binary switch array).
+- **Ch.5 Sri Lanka map** — dead-accurate extruded island (1,900-point
+  geoBoundaries outline, 63 KB) with six pulsing orange pins at the real
+  Google Maps coordinates of every class hub; clicking a pin (or the list)
+  opens the centre's Maps listing.
+- **Ch.6 Community · Ch.7 3D gallery** — stat panels over the starfield, then
+  the eight class photos as framed planes in a spiral fly-through.
+- **Soft landing** — scene fades to white; LMS banner, ad slots, contact form
+  and footer return to normal flow.
+- Retired: globe + database models, old ScrollJourney/Features/Community/
+  Gallery sections (content absorbed into chapters).
+
+### Fixed
+- 3D world frozen at hero state: the new App never wired
+  `useMotionValueEvent` into the shared progress ref.
+- Workstation module plates rendered outside the tower (local/world space mix).
+- Mobile: 3D name typography overflowed narrow screens — setpiece now scales
+  down and drops below the copy on phones.

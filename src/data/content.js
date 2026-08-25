@@ -33,135 +33,80 @@ export const SITE = {
 }
 
 export const NAV_LINKS = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Learning', href: '#learning' },
-  { label: 'Explore', href: '#explore' },
-  { label: 'Community', href: '#community' },
+  { label: 'Home', href: '#chapter-hero' },
+  { label: 'About', href: '#chapter-identity' },
+  { label: 'Syllabus', href: '#chapter-vault' },
+  { label: 'Centres', href: '#chapter-map' },
+  { label: 'Community', href: '#chapter-community' },
   { label: 'Contact', href: '#contact' },
 ]
 
-export const HERO_CHIPS = [
-  'A/L ICT Theory & Revision',
-  '6 island-wide class hubs',
-  'BICT Online LMS',
+/**
+ * The full-site Z-scroll. The 3D track is one tall page; each chapter owns
+ * a [start, end] slice of the total scroll progress. The camera, scene
+ * colours and overlay panels are all driven from these spans.
+ */
+export const CHAPTERS = [
+  { id: 'hero', start: 0.0, end: 0.1 },
+  { id: 'identity', start: 0.1, end: 0.22 },
+  { id: 'track', start: 0.22, end: 0.32 },
+  { id: 'core', start: 0.32, end: 0.48 },
+  { id: 'vault', start: 0.48, end: 0.64 },
+  { id: 'map', start: 0.64, end: 0.76 },
+  { id: 'community', start: 0.76, end: 0.84 },
+  { id: 'gallery', start: 0.84, end: 0.94 },
 ]
+export const TRACK_VH = 1500 // height of the 3D scroll track, in vh
 
-/** Real audience numbers from his own public profiles (checked 2026-08-25). */
-export const SOCIAL_STATS = [
-  {
-    label: 'Facebook followers',
-    value: '152K+',
-    href: SITE.facebookUrl,
-    icon: 'facebook',
-  },
-  {
-    label: 'YouTube subscribers',
-    value: '80K+',
-    sub: '332 videos',
-    href: SITE.youtubeUrl,
-    icon: 'youtube',
-  },
-  {
-    label: 'TikTok likes',
-    value: '713K+',
-    sub: '@bhanuka_sir_official',
-    href: SITE.tiktokUrl,
-    icon: 'tiktok',
-  },
-  {
-    label: 'Class locations',
-    value: '6',
-    sub: 'island-wide hubs',
-    href: '#contact',
-    icon: 'pin',
-  },
-]
-
-/** Verified physical class venues (from his official video descriptions). */
+/** Verified physical class hubs — coordinates from Google Maps place lookups
+ * (checked 2026-08-25). `query` is used for the official Maps deep-link. */
 export const VENUES = [
-  { name: 'Zeon Opera', town: 'Horana' },
-  { name: 'Rotary', town: 'Nugegoda' },
-  { name: 'New Montana', town: 'Gampaha' },
-  { name: 'Pencil Opera', town: 'Kurunegala' },
-  { name: 'Sisulka', town: 'Rathnapura' },
-  { name: 'Gurumandala', town: 'Kalutara' },
+  {
+    name: 'Zeon Opera',
+    town: 'Horana',
+    lat: 6.7178,
+    lng: 80.0679,
+    query: 'Zeon Opera, Horana',
+  },
+  {
+    name: 'Rotary',
+    town: 'Nugegoda',
+    lat: 6.871,
+    lng: 79.8906,
+    query: 'Rotary Hall, Nugegoda',
+  },
+  {
+    name: 'New Montana',
+    town: 'Gampaha',
+    lat: 7.0931,
+    lng: 79.989,
+    query: 'New Montana Class, Gampaha',
+  },
+  {
+    name: 'Pencil Opera',
+    town: 'Kurunegala',
+    lat: 7.4843,
+    lng: 80.3684,
+    query: 'Pencil Opera, Kurunegala',
+  },
+  {
+    name: 'Sisulka',
+    town: 'Rathnapura',
+    lat: 6.686,
+    lng: 80.3974,
+    query: 'Sisulka Higher Educational Institute, Rathnapura',
+  },
+  {
+    name: 'Gurumandala',
+    town: 'Kalutara',
+    lat: 6.5802,
+    lng: 79.9635,
+    query: 'Gurumandala, Kalutara',
+  },
 ]
 
-export const FEATURES = [
-  {
-    title: 'A/L ICT Theory',
-    body: 'Structured theory classes covering the full G.C.E. A/L ICT syllabus — number systems, logic gates, Boolean algebra, operating systems, programming and more.',
-    icon: 'book',
-  },
-  {
-    title: 'Revision Classes',
-    body: 'Focused revision programmes ahead of the examination — including dedicated revision batches such as the AL ICT 2027 revision series.',
-    icon: 'refresh',
-  },
-  {
-    title: 'BICT Online LMS',
-    body: 'The BEICT online learning system extends every class — lessons and resources stay with you at lms.beict.lk, anywhere in the island.',
-    icon: 'cloud',
-  },
-  {
-    title: 'A Community, Not Just a Class',
-    body: 'Half a million students and parents follow Bhanuka Sir’s teaching across Facebook, YouTube and TikTok — with seminars, events and student-feedback episodes like සර්ට පහළොවයි.',
-    icon: 'chat',
-  },
-]
-
-/**
- * The Z-scroll journey: scrolling dollies the camera down the Z axis past
- * three glTF stages while real promo content tells the BEICT story.
- */
-export const JOURNEY = {
-  intro: {
-    eyebrow: 'The BEICT way',
-    title: 'Scroll — see how Bhanuka Sir teaches',
-    lead: 'One flight through the classes, the island-wide network and the online system behind Sri Lanka’s leading A/L ICT tuition.',
-  },
-  stations: [
-    {
-      id: 'chip',
-      topic: 'Theory Classes',
-      title: 'Every syllabus topic, made simple',
-      blurb:
-        'From number systems and logic gates to Boolean algebra, operating systems and Python — structured theory for the G.C.E. A/L ICT syllabus, taught the way a quarter-million followers keep coming back to.',
-      cta: { label: 'See the classes', href: '#learning' },
-      file: '/models/cpu-chip.gltf',
-      z: 0,
-    },
-    {
-      id: 'globe',
-      topic: 'Island-wide Network',
-      title: 'Six class hubs across Sri Lanka',
-      blurb:
-        'Catch Bhanuka Sir live at Zeon Opera Horana, Rotary Nugegoda, New Montana Gampaha, Pencil Opera Kurunegala, Sisulka Rathnapura or Gurumandala Kalutara — one network of classrooms.',
-      cta: { label: 'Find a class near you', href: '#venues' },
-      file: '/models/network-globe.gltf',
-      z: -30,
-      venues: true,
-    },
-    {
-      id: 'database',
-      topic: 'BICT Online',
-      title: 'Your classroom, online 24/7',
-      blurb:
-        'Every lesson lives on in the BEICT online learning system. Sign in at lms.beict.lk — or join the Telegram community at t.me/bealict — and keep learning long after the bell rings.',
-      cta: { label: 'Enter the LMS', href: SITE.lmsUrl, external: true },
-      file: '/models/database.gltf',
-      z: -60,
-    },
-  ],
-}
-
-/**
- * Ad banners — drop your social-media class ads here.
- * Replace public/images/banners/banner-1.jpg … banner-3.jpg with the same
- * creatives you post on Facebook/TikTok. Until then each slot shows its
- * built-in promo design.
- */
+export const mapsUrlFor = (venue) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.query)}`
 export const BANNERS = [
   {
     id: 1,
