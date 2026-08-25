@@ -58,10 +58,10 @@ function Banner({ banner }) {
  */
 export default function Banners() {
   return (
-    <section className="bg-[#060b18] py-20 sm:py-24" aria-labelledby="banners-title">
+    <section className="py-20 sm:py-24" aria-labelledby="banners-title">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeading dark
+          <SectionHeading
             eyebrow='Announcements'
             title={<span id="banners-title">Latest from BEICT</span>}
             lead="Seminars, new batches and online events — tap through for details."

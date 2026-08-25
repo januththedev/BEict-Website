@@ -10,47 +10,58 @@ import LankaMap from './setpieces/LankaMap.jsx'
 import GalleryPlanes from './setpieces/GalleryPlanes.jsx'
 
 /**
- * Camera keyframes across the whole-page scroll progress.
+ * Camera keyframes across the whole-page scroll progress: [p, z, frameX].
+ * frameX shifts the camera (and its look target) left so each chapter's
+ * hero object sits on the RIGHT of the screen, clear of the copy.
  * Setpieces: chip z 0 · core z −40 · vault z −80 · map z −120 ·
  * gallery planes z −148…−164.
  */
 const CAM_KEYS = [
-  [0.0, 6.2],
-  [0.1, 7.5],
-  [0.22, 9],
-  [0.32, 10],
-  [0.36, -33],
-  [0.44, -33],
-  [0.52, -73],
-  [0.6, -73],
-  [0.68, -106.5],
-  [0.76, -108],
-  [0.84, -140],
-  [0.94, -161],
-  [1.0, -172],
+  [0.0, 6.2, -1.9],
+  [0.1, 7.5, -1.6],
+  [0.22, 9, -1.9],
+  [0.32, 10, -1.2],
+  [0.36, -33, -1.8],
+  [0.44, -33, -1.8],
+  [0.52, -73, -1.8],
+  [0.6, -73, -1.8],
+  [0.68, -106.5, -1.6],
+  [0.76, -108, -1.6],
+  [0.84, -140, 0],
+  [0.94, -161, 0],
+  [1.0, -172, 0],
 ]
 
-/** Scene palette: one continuous near-black keynote void. */
+/** Scene palette: clean white/ice editorial world, always light. */
 const BG_KEYS = [
-  [0.0, '#04070f'],
-  [0.5, '#081020'],
-  [1.0, '#0a1428'],
+  [0.0, '#ffffff'],
+  [0.5, '#f6f9ff'],
+  [1.0, '#ffffff'],
 ]
 
 function CameraRig({ progressRef, reduce }) {
   const camera = useThree((s) => s.camera)
   useFrame(() => {
     const p = progressRef.current
-    const z = lerpKeys(CAM_KEYS, p)
+    const z = lerpKeys(
+      CAM_KEYS.map(([k, z0]) => [k, z0]),
+      p,
+    )
+    // Horizontal framing: negative x puts the centred object right of the copy.
+    const mobile = window.innerWidth < 768
+    const x = lerpKeys(
+      CAM_KEYS.map(([k, , x0]) => [k, mobile ? x0 * 0.25 : x0]),
+      p,
+    )
     const sway = reduce ? 0 : 1
     camera.position.set(
-      Math.sin(p * Math.PI * 4) * 0.8 * sway,
-      1.1 + Math.cos(p * Math.PI * 2.4) * 0.35 * sway,
+      x + Math.sin(p * Math.PI * 4) * 0.25 * sway,
+      1.1 + Math.cos(p * Math.PI * 2.4) * 0.3 * sway,
       z,
     )
-    camera.lookAt(0, 0.3, z - 12)
+    camera.lookAt(x, 0.3, z - 12)
     // gentle roll at chapter boundaries
-    if (!reduce) camera.rotateZ(Math.sin(p * Math.PI * 5) * 0.018)
+    if (!reduce) camera.rotateZ(Math.sin(p * Math.PI * 5) * 0.015)
   })
   return null
 }
@@ -74,7 +85,7 @@ function Starfield({ count = 220 }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial size={0.07} color="#8ec5ff" transparent opacity={0.6} sizeAttenuation depthWrite={false} />
+      <pointsMaterial size={0.06} color="#93b4fd" transparent opacity={0.35} sizeAttenuation depthWrite={false} />
     </points>
   )
 }

@@ -162,7 +162,7 @@ export default function Vault({ progressRef, reduce }) {
       {/* Holographic scan sweep */}
       <mesh ref={scan} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
         <planeGeometry args={[5.4, 2.2]} />
-        <meshBasicMaterial color="#22d3ee" transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        <meshBasicMaterial color="#0891b2" transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Cartridges + their expansion worlds */}

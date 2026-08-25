@@ -216,3 +216,12 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
 ### Perf
 - Transmission pass removed, DPR capped 1.5, MSAA 0 + no SMAA — iGPU-friendly.
 - Verified 60fps in testing; per-frame material traverses cached.
+
+## [3.1.0] — 2026-08-26 — White editorial pass
+- Palette reverted to the brand's **white & blue**: clean white/ice world
+  throughout (no dark chapters), dark-ink typography, blue gradient accents.
+- Camera keyframes gained a per-chapter **frameX**: every setpiece is framed
+  on the RIGHT of the screen, clear of the left-aligned copy (no more
+  text/3D collisions). Mobile halves the offset.
+- Chip polish: dark metallic capacitors, brighter substrate, contact shadow.
+- Map/arc/beam/mote colours re-tuned for light background.

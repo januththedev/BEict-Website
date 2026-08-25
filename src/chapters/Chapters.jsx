@@ -63,16 +63,16 @@ function ChapterFrame({ chapter, children, align = 'left' }) {
 
 function Eyebrow({ children }) {
   return (
-    <p className="flex items-center gap-3 font-display text-xs font-semibold tracking-[0.3em] text-cyan-300/90 uppercase">
-      <span className="inline-block h-px w-10 bg-cyan-300/60" aria-hidden />
+    <p className="flex items-center gap-3 font-display text-xs font-semibold tracking-[0.3em] text-brand-700 uppercase">
+      <span className="inline-block h-px w-10 bg-brand-400" aria-hidden />
       {children}
     </p>
   )
 }
 
-const H1 = 'font-display font-extrabold tracking-[-0.03em] text-white leading-[0.98]'
-const H2 = 'font-display font-extrabold tracking-[-0.02em] text-white leading-[1.02]'
-const LEAD = 'text-lg leading-relaxed text-slate-400 sm:text-xl'
+const H1 = 'font-display font-extrabold tracking-[-0.03em] text-ink leading-[0.98]'
+const H2 = 'font-display font-extrabold tracking-[-0.02em] text-ink leading-[1.02]'
+const LEAD = 'text-lg leading-relaxed text-slate-600 sm:text-xl'
 
 /* -------------------------------- chapters ------------------------------- */
 
@@ -106,7 +106,7 @@ function HeroChapter() {
           <Button href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="px-8 py-4 text-base">
             Start learning
           </Button>
-          <Button href="#contact" variant="ghostDark" className="px-8 py-4 text-base">
+          <Button href="#contact" variant="secondary" className="px-8 py-4 text-base">
             Contact Bhanuka Sir
           </Button>
         </motion.div>
@@ -118,7 +118,7 @@ function HeroChapter() {
 function IdentityChapter({ progress }) {
   const ch = CHAPTERS[1]
   return (
-    <ChapterFrame chapter={ch} align="right">
+    <ChapterFrame chapter={ch} align="left">
       <div className="max-w-xl">
         <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
           <Eyebrow>Who is Bhanuka Sir</Eyebrow>
@@ -135,7 +135,7 @@ function IdentityChapter({ progress }) {
               width="84"
               height="84"
               loading="lazy"
-              className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-white/10"
+              className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-slate-200"
             />
             <p>
               <span className="font-semibold text-white">{SITE.owner}</span> — {SITE.tagline}.
@@ -162,11 +162,11 @@ function TrackChapter({ progress }) {
           <Eyebrow>Track record</Eyebrow>
         </Beat>
         {beats.map((b, i) => (
-          <Beat key={b.l} progress={progress} chapter={ch} index={i + 1} count={4} as="div" className="mb-7 border-l-2 border-cyan-400/40 pl-6">
-            <p className="font-display text-[clamp(2.4rem,5.5vw,4.6rem)] font-extrabold leading-none tracking-tight text-white">
+          <Beat key={b.l} progress={progress} chapter={ch} index={i + 1} count={4} as="div" className="mb-7 border-l-2 border-brand-300 pl-6">
+            <p className="font-display text-[clamp(2.4rem,5.5vw,4.6rem)] font-extrabold leading-none tracking-tight text-navy-800">
               {b.v}
             </p>
-            <p className="mt-2 text-base text-slate-400">{b.l}</p>
+            <p className="mt-2 text-base text-slate-500">{b.l}</p>
           </Beat>
         ))}
       </div>
@@ -206,15 +206,15 @@ function CoreChapter({ progress }) {
         </Beat>
         <Beat progress={progress} chapter={ch} index={2} count={3} as="div" className={`mt-6 ${LEAD} space-y-3`}>
           <p>
-            <span className="text-cyan-300">The shell</span> — full A/L ICT coverage, in
+            <span className="text-brand-600">The shell</span> — full A/L ICT coverage, in
             halls across the island and on YouTube for everyone.
           </p>
           <p>
-            <span className="text-cyan-300">The circuits</span> — theory, revision,
+            <span className="text-brand-600">The circuits</span> — theory, revision,
             practice. The same loop, every batch, until it sticks.
           </p>
           <p>
-            <span className="text-cyan-300">The core</span> — a quarter-million-strong
+            <span className="text-brand-600">The core</span> — a quarter-million-strong
             community, learning together every week.
           </p>
         </Beat>
@@ -272,7 +272,7 @@ function MapChapter({ progress }) {
               href={mapsUrlFor(v)}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:border-cyan-300/60 hover:text-white"
+              className="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-brand-400 hover:text-brand-700"
             >
               {v.name} · {v.town}
             </a>
@@ -300,7 +300,7 @@ function CommunityChapter({ progress }) {
           {stats.map((s, i) => (
             <Beat key={s.plat} progress={progress} chapter={ch} index={i + 1} count={4} as="div">
               <a href={s.href} target="_blank" rel="noopener noreferrer" className="group block">
-                <p className="font-display text-[clamp(3rem,6vw,5rem)] font-extrabold leading-none tracking-tight text-white">
+                <p className="font-display text-[clamp(3rem,6vw,5rem)] font-extrabold leading-none tracking-tight text-navy-800">
                   {s.v}
                 </p>
                 <p className="mt-2 text-sm text-slate-500">{s.l}</p>

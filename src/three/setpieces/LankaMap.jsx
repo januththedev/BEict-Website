@@ -181,7 +181,7 @@ export default function LankaMap({ progressRef, reduce }) {
           <group ref={arcs}>
             {arcGeoms.map((geo, i) => (
               <mesh key={i} geometry={geo}>
-                <meshBasicMaterial color="#67e8f9" transparent opacity={1} blending={THREE.AdditiveBlending} depthWrite={false} />
+                <meshBasicMaterial color="#2563eb" transparent opacity={0.55} depthWrite={false} />
               </mesh>
             ))}
           </group>
@@ -216,7 +216,7 @@ export default function LankaMap({ progressRef, reduce }) {
                 position={[x, y + 0.75, 0.5]}
               >
                 <cylinderGeometry args={[0.025, 0.06, 1.5, 8, 1, true]} />
-                <meshBasicMaterial color="#ffb95e" transparent opacity={0.2} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+                <meshBasicMaterial color="#f59e0b" transparent opacity={0.28} depthWrite={false} side={THREE.DoubleSide} />
               </mesh>
             )
           })}

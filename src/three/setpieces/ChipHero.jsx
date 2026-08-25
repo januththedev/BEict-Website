@@ -46,9 +46,9 @@ export default function ChipHero({ progressRef, reduce }) {
     canvas.width = canvas.height = 256
     const ctx = canvas.getContext('2d')
     const g = ctx.createRadialGradient(128, 128, 10, 128, 128, 128)
-    g.addColorStop(0, 'rgba(56, 189, 248, 0.55)')
-    g.addColorStop(0.5, 'rgba(37, 99, 235, 0.22)')
-    g.addColorStop(1, 'rgba(4, 7, 15, 0)')
+    g.addColorStop(0, 'rgba(147, 180, 253, 0.5)')
+    g.addColorStop(0.5, 'rgba(59, 110, 246, 0.18)')
+    g.addColorStop(1, 'rgba(244, 248, 255, 0)')
     ctx.fillStyle = g
     ctx.fillRect(0, 0, 256, 256)
     const tex = new THREE.CanvasTexture(canvas)
@@ -61,6 +61,11 @@ export default function ChipHero({ progressRef, reduce }) {
     root.traverse((o) => {
       if (!o.isMesh || !o.material) return
       if (o.material.color && o.name === 'Substrate') o.material.color.set('#1c3f8f')
+      if (o.name === 'Capacitors' && o.material.color) {
+        o.material.color.set('#0c1b3a')
+        o.material.metalness = 0.6
+        o.material.roughness = 0.3
+      }
       if (o.name === 'Pins') o.material.emissive?.set('#8a6a1f')
     })
   }, [root])
@@ -134,10 +139,15 @@ export default function ChipHero({ progressRef, reduce }) {
 
   return (
     <group ref={group} position={[0, 0.2, 0]}>
+      {/* soft contact shadow under the chip */}
+      <mesh position={[0.2, -1.35, 0.4]} rotation={[-Math.PI / 2, 0, 0]} scale={[3.2, 2.2, 1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial map={haloTex} transparent opacity={0.35} depthWrite={false} color="#1d43cf" />
+      </mesh>
       {/* product-shot halo behind the chip */}
       <mesh position={[0, 0.3, -1.6]} scale={7.5}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={haloTex} transparent opacity={0.85} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial map={haloTex} transparent opacity={0.85} depthWrite={false} />
       </mesh>
       {/* rim/back lighting so the dark chip reads on the black void */}
       <pointLight position={[0, 1.6, -3.2]} intensity={14} color="#38bdf8" distance={12} />

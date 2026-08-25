@@ -136,7 +136,7 @@ export default function NeuralCore({ progressRef, reduce }) {
       {/* Orbiting data motes */}
       <instancedMesh ref={moteMesh} args={[undefined, undefined, moteCount]}>
         <sphereGeometry args={[0.035, 8, 8]} />
-        <meshBasicMaterial color="#bae6fd" transparent opacity={0.8} depthWrite={false} />
+        <meshBasicMaterial color="#3b82f6" transparent opacity={0.7} depthWrite={false} />
       </instancedMesh>
 
       {/* Halo ring behind the core */}
