@@ -86,6 +86,16 @@ body {
   mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 40%, transparent 75%);
 }
 
+/* Frosted glass panel — used where copy floats over busy 3D */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 32px -12px rgba(12, 27, 58, 0.14);
+  border-radius: 1.25rem;
+}
+
 /* Easter-egg page shudder when the orange rain triggers */
 .orange-shake {
   animation: orange-shake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;

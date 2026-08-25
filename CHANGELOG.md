@@ -225,3 +225,16 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
   text/3D collisions). Mobile halves the offset.
 - Chip polish: dark metallic capacitors, brighter substrate, contact shadow.
 - Map/arc/beam/mote colours re-tuned for light background.
+
+## [3.2.0] — 2026-08-26 — Glass pill nav + no-blank beats
+### Changed
+- **Floating glass pill navbar** — rounded translucent container with
+  backdrop blur, detached from the page edge; mobile menu is a matching
+  frosted sheet.
+- **Glassmorphism where needed** — frosted panels behind the Vault/Map copy
+  and glass tiles under the Community stats (legibility over busy 3D).
+### Fixed
+- **Blank sections**: chapter beats were scroll-gated so content was invisible
+  for most of each chapter's scroll. Beats now stagger in fast and STAY
+  visible until the chapter ends.
+- Identity chapter name rendered white-on-white.

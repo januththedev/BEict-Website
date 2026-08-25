@@ -27,12 +27,14 @@ function Beat({ progress, chapter, index, count, className = '', children, as: T
     const { start, end } = chapter
     const span = end - start
     const slot = span / count
-    // The first beat is fully visible the moment the chapter begins.
-    const a = start + (index === 0 ? -slot : index * slot)
-    const b = a + slot * 1.6
+    // Quick staggered entrance, then STAYS visible for the whole chapter —
+    // no blank stretches while a chapter is on screen.
+    const a = start + index * span * 0.05 - (index === 0 ? slot : 0)
     const apply = (p) => {
-      const o = smooth((p - a) / (slot * 0.5)) * (1 - smooth((p - (end - span * 0.06)) / (span * 0.1)))
-      const y = (1 - smooth((p - a) / (slot * 0.5))) * 34
+      const fadeIn = smooth((p - a) / (slot * 0.7))
+      const fadeOut = smooth((p - (end - span * 0.1)) / (span * 0.1))
+      const o = fadeIn * (1 - fadeOut)
+      const y = (1 - fadeIn) * 30
       el.style.opacity = clamp01(o).toFixed(3)
       el.style.transform = `translateY(${y.toFixed(1)}px)`
     }
@@ -138,7 +140,7 @@ function IdentityChapter({ progress }) {
               className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-slate-200"
             />
             <p>
-              <span className="font-semibold text-white">{SITE.owner}</span> — {SITE.tagline}.
+              <span className="font-semibold text-ink">{SITE.owner}</span> — {SITE.tagline}.
               Teaching {SITE.subject} for {SITE.level}, from Horana to the whole island.
             </p>
           </div>
@@ -236,7 +238,7 @@ function VaultChapter({ progress }) {
   const ch = CHAPTERS[4]
   return (
     <ChapterFrame chapter={ch} align="left">
-      <div className="max-w-xl">
+      <div className="glass-panel max-w-xl p-6 sm:p-8">
         <Beat progress={progress} chapter={ch} index={0} count={2} as="div" className="mb-5">
           <Eyebrow>Syllabus Vault</Eyebrow>
         </Beat>
@@ -255,7 +257,7 @@ function MapChapter({ progress }) {
   const ch = CHAPTERS[5]
   return (
     <ChapterFrame chapter={ch} align="left">
-      <div className="max-w-xl">
+      <div className="glass-panel max-w-xl p-6 sm:p-8">
         <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
           <Eyebrow>Class centres</Eyebrow>
         </Beat>
@@ -299,7 +301,7 @@ function CommunityChapter({ progress }) {
         <div className="grid gap-10 sm:grid-cols-3">
           {stats.map((s, i) => (
             <Beat key={s.plat} progress={progress} chapter={ch} index={i + 1} count={4} as="div">
-              <a href={s.href} target="_blank" rel="noopener noreferrer" className="group block">
+              <a href={s.href} target="_blank" rel="noopener noreferrer" className="group block rounded-2xl border border-white/60 bg-white/50 p-5 shadow-[0_8px_32px_-12px_rgba(12,27,58,0.12)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1">
                 <p className="font-display text-[clamp(3rem,6vw,5rem)] font-extrabold leading-none tracking-tight text-navy-800">
                   {s.v}
                 </p>

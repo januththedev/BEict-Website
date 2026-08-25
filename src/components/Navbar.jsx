@@ -72,16 +72,13 @@ export default function Navbar() {
   }
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
-          ? 'bg-white/85 shadow-[0_8px_30px_-12px_rgba(12,27,58,0.15)] backdrop-blur-lg'
-          : 'bg-transparent'
-      }`}
-    >
+    <header ref={headerRef} className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
       <nav
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-[4.5rem] lg:px-8"
+        className={`mx-auto flex h-16 max-w-6xl items-center justify-between rounded-2xl border px-4 shadow-[0_8px_32px_-12px_rgba(12,27,58,0.18)] backdrop-blur-xl transition-colors duration-300 sm:px-6 ${
+          scrolled || open
+            ? 'border-white/70 bg-white/70'
+            : 'border-white/50 bg-white/40'
+        }`}
         aria-label="Main navigation"
       >
         <Logo />
@@ -128,9 +125,12 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile menu panel */}
+      {/* Mobile menu panel — glass, attached to the pill */}
       {open && (
-        <div id="mobile-menu" className="border-t border-slate-100 bg-white/95 backdrop-blur-lg lg:hidden">
+        <div
+          id="mobile-menu"
+          className="mx-auto mt-2 max-w-6xl rounded-2xl border border-white/60 bg-white/70 shadow-[0_8px_32px_-12px_rgba(12,27,58,0.18)] backdrop-blur-xl lg:hidden"
+        >
           <ul className="space-y-1 px-4 py-4">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
