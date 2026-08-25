@@ -20,6 +20,40 @@ const CHIP_EXPLODE = {
 
 const DISK_SIGN = { DiskTop: 1, DiskMid: 0, DiskBottom: -1 }
 
+/** Drifting data-motes along the flight path — depth cue for the Z-scroll. */
+function Starfield({ count = 160 }) {
+  const ref = useRef(null)
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 34
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 22
+      arr[i * 3 + 2] = 10 - Math.random() * 85 // spread along the whole flight
+    }
+    return arr
+  }, [count])
+
+  useFrame(({ clock }) => {
+    if (ref.current) ref.current.rotation.y = clock.elapsedTime * 0.02
+  })
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.07}
+        color="#8ec5ff"
+        transparent
+        opacity={0.65}
+        sizeAttenuation
+        depthWrite={false}
+      />
+    </points>
+  )
+}
+
 /**
  * Camera dolly: scroll progress (0..1) maps to a flight down the Z axis
  * with a gentle sway. The section's scrollable range puts panel centres at
@@ -132,6 +166,7 @@ export default function JourneyScene({ progressRef, reduce }) {
       <directionalLight position={[4, 6, 5]} intensity={1.7} />
       <directionalLight position={[-5, 2, -4]} intensity={0.9} color="#67e8f9" />
       <CameraRig progressRef={progressRef} reduce={Boolean(reduce)} />
+      {!reduce && <Starfield />}
       <Suspense fallback={null}>
         {JOURNEY.stations.map((station) => (
           <Station key={station.id} station={station} reduce={reduce} />

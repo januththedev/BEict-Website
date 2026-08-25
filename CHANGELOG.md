@@ -142,3 +142,16 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
 ### Added
 - Footer credit: “Developed by Januth Nimnal” linking to www.januth.dev.
 - Git repository initialised; deployment via Vercel (auto-deploys on push).
+
+## [Unreleased] — easter egg & motion polish
+### Added
+- 🍊 **Orange rain easter egg** — clicking Bhanuka Sir's portrait 5 times quickly
+  (2 s window) erupts hundreds of physics-driven oranges from the photo across
+  the entire site (`OrangeRain.jsx`, fixed canvas overlay, gravity + drag +
+  spin + fade) with a playful page shudder. Disabled under reduced motion.
+- Journey starfield — 160 drifting data-motes along the Z flight path for
+  depth (`JourneyScene.jsx`).
+### Changed
+- Scroll reveals are snappier (0.45 s, smaller offset, trigger earlier via
+  viewport margin, stagger halved) so fast scrolling never leaves sections
+  looking half-empty.

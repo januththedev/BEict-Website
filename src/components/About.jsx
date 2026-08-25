@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { SITE } from '../data/content.js'
 import { Button, Reveal, SectionHeading } from './ui.jsx'
 
@@ -17,6 +18,29 @@ const POINTS = [
 ]
 
 export default function About() {
+  const eggState = useRef({ count: 0, last: 0 })
+
+  // Secret: five quick clicks on the portrait unleash the orange rain.
+  function onPortraitClick(e) {
+    const now = Date.now()
+    const state = eggState.current
+    if (now - state.last > 2000) state.count = 0
+    state.last = now
+    state.count += 1
+    if (state.count >= 5) {
+      state.count = 0
+      const rect = e.currentTarget.getBoundingClientRect()
+      window.dispatchEvent(
+        new CustomEvent('beict:orange-rain', {
+          detail: {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          },
+        }),
+      )
+    }
+  }
+
   return (
     <section id="about" className="scroll-mt-20 py-20 sm:py-24" aria-labelledby="about-title">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
@@ -27,7 +51,10 @@ export default function About() {
               className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-brand-500/25 to-cyan-400/25 blur-xl"
               aria-hidden
             />
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-brand-100 bg-gradient-to-b from-brand-100 via-brand-50 to-cyan-100 shadow-xl shadow-brand-900/10">
+            <div
+              onClick={onPortraitClick}
+              className="relative cursor-zoom-in overflow-hidden rounded-[1.75rem] border border-brand-100 bg-gradient-to-b from-brand-100 via-brand-50 to-cyan-100 shadow-xl shadow-brand-900/10"
+            >
               {/* Real photograph is used when available; otherwise this
                   placeholder stands in until the photo is added. */}
               <img
