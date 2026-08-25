@@ -40,7 +40,7 @@ const CHANNELS = [
 function Field({ id, label, error, children }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-navy-800">
+      <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-slate-200">
         {label}
       </label>
       {children}
@@ -57,8 +57,8 @@ function Field({ id, label, error, children }) {
 }
 
 const inputCls = (invalid) =>
-  `w-full rounded-xl border bg-white px-4 py-3 text-sm text-ink placeholder:text-slate-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25 ${
-    invalid ? 'border-red-400' : 'border-slate-200 hover:border-brand-300'
+  `w-full rounded-xl border bg-white px-4 py-3 text-sm text-white placeholder:text-slate-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25 ${
+    invalid ? 'border-red-400/70' : 'border-white/10 hover:border-brand-400/60'
   }`
 
 export default function Contact() {
@@ -102,7 +102,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative scroll-mt-20 overflow-hidden bg-ice py-20 sm:py-24"
+      className="relative scroll-mt-20 overflow-hidden bg-[#060b18] py-20 sm:py-24"
       aria-labelledby="contact-title"
     >
       <div className="glow-orb bottom-[-100px] left-[-80px] size-[320px] bg-brand-300/30" aria-hidden />
@@ -125,7 +125,7 @@ export default function Contact() {
                 href={channel.href}
                 target={channel.href.startsWith('http') ? '_blank' : undefined}
                 rel={channel.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="group flex items-center gap-4 rounded-2xl border border-brand-100 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lg"
+                className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40"
               >
                 <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-brand text-white shadow-md shadow-brand-600/25" aria-hidden>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="size-6">
@@ -133,10 +133,10 @@ export default function Contact() {
                   </svg>
                 </span>
                 <span>
-                  <span className="block text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                  <span className="block text-xs font-semibold tracking-wider text-slate-400 uppercase">
                     {channel.label}
                   </span>
-                  <span className="block font-display font-semibold text-navy-800 group-hover:text-brand-700">
+                  <span className="block font-display font-semibold text-white group-hover:text-cyan-300">
                     {channel.value}
                   </span>
                 </span>
@@ -144,7 +144,7 @@ export default function Contact() {
             ))}
             <p className="pt-2 text-sm leading-relaxed text-slate-500">
               Prefer the online system? Sign in at{' '}
-              <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-700 underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">
+              <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-cyan-300 underline decoration-cyan-300/30 underline-offset-2 hover:decoration-cyan-300">
                 lms.beict.lk
               </a>{' '}
               any time.
@@ -156,7 +156,7 @@ export default function Contact() {
             <form
               onSubmit={onSubmit}
               noValidate
-              className="rounded-2xl border border-brand-100 bg-white p-6 shadow-xl shadow-brand-900/5 sm:p-8"
+              className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur sm:p-8"
             >
               {status === 'sent' ? (
                 <div role="status" className="flex flex-col items-center gap-4 py-10 text-center">

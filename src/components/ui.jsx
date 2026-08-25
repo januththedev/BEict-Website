@@ -21,6 +21,8 @@ export function Button({
       'border border-brand-200 bg-white text-brand-700 hover:border-brand-400 hover:bg-brand-50 hover:-translate-y-0.5 active:translate-y-0',
     ghostLight:
       'border border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/20 hover:-translate-y-0.5 active:translate-y-0',
+    ghostDark:
+      'border border-white/20 text-white hover:border-cyan-300/60 hover:bg-white/5 hover:-translate-y-0.5 active:translate-y-0',
     white:
       'bg-white text-brand-700 shadow-lg shadow-navy-950/25 hover:-translate-y-0.5 active:translate-y-0',
   }

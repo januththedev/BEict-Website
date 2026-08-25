@@ -41,13 +41,13 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: #ffffff;
-  color: var(--color-ink);
+  background-color: #04070f;
+  color: #e2e8f0;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--color-brand-600);
+  background-color: var(--color-brand-500);
   color: #ffffff;
 }
 

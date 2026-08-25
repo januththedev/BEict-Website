@@ -7,9 +7,9 @@ import { labelTexture } from '../textures.js'
 import { useModelParts } from '../useModelParts.js'
 
 const CARTRIDGES = [
-  { label: 'HARDWARE & ARCHITECTURE', color: '#f59e0b', x: -2.3 },
-  { label: 'NETWORKING & SECURITY', color: '#06b6d4', x: 0 },
-  { label: 'SOFTWARE & ALGORITHMS', color: '#a78bfa', x: 2.3 },
+  { label: 'HARDWARE & ARCHITECTURE', color: '#b45309', x: -2.3 },
+  { label: 'NETWORKING & SECURITY', color: '#0e7490', x: 0 },
+  { label: 'SOFTWARE & ALGORITHMS', color: '#6d28d9', x: 2.3 },
 ]
 
 const OSI_LAYERS = ['Application', 'Presentation', 'Session', 'Transport', 'Network', 'Data Link', 'Physical']
@@ -69,14 +69,30 @@ export default function Vault({ progressRef, reduce }) {
 
   const binaryCount = 40
   const binaryRefs = useRef([])
+  const scan = useRef(null)
+  const stripRefs = useRef([])
 
   useFrame(({ clock }) => {
     if (!group.current) return
     const p = progressRef.current
     const t = clock.getElapsedTime()
-    const fade = 1 - smooth(sub(p, 0.63, 0.665))
     group.current.visible = p > 0.45 && p < 0.68
-    void fade
+
+    // Holographic scan sweep while any cartridge expands.
+    if (scan.current) {
+      let active = 0
+      CARTRIDGES.forEach((_, i) => {
+        active = Math.max(active, smooth(sub(p, 0.545 + i * 0.022, 0.615)) * (1 - smooth(sub(p, 0.615, 0.64))))
+      })
+      scan.current.visible = active > 0.02
+      scan.current.position.y = -0.6 + ((t * 0.55) % 1) * 3.2
+      scan.current.material.opacity = active * 0.5
+    }
+
+    // Rack strips pulse.
+    stripRefs.current.forEach((s, i) => {
+      if (s) s.material.emissiveIntensity = 1.2 + Math.sin(t * 2 + i * Math.PI) * 0.5
+    })
 
     CARTRIDGES.forEach((c, i) => {
       const cart = carts.current[i]
@@ -109,9 +125,6 @@ export default function Vault({ progressRef, reduce }) {
       })
     })
 
-    if (monogram.current) {
-      monogram.current.material.opacity = fade
-    }
     const pulse = reduce ? 0 : Math.sin(t * 2.4) * 0.5 + 0.5
     binaryRefs.current.forEach((b, i) => {
       if (b) b.position.y = b.userData.baseY + pulse * (i % 2) * 0.05
@@ -128,17 +141,29 @@ export default function Vault({ progressRef, reduce }) {
             <meshStandardMaterial color="#0c1b3a" metalness={0.8} roughness={0.3} />
           </mesh>
         ))}
+        {[-1.35, 1.35].map((x, i) => (
+          <mesh key={`strip-${x}`} ref={(el) => (stripRefs.current[i] = el)} position={[x * 0.94, 0, 0.26]}>
+            <boxGeometry args={[0.04, 2.4, 0.02]} />
+            <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={1.2} />
+          </mesh>
+        ))}
         {[-0.85, 0, 0.85].map((y) => (
           <mesh key={y} position={[0, y, -0.1]}>
             <boxGeometry args={[2.6, 0.1, 0.34]} />
             <meshStandardMaterial color="#12295c" metalness={0.7} roughness={0.35} />
           </mesh>
         ))}
-        <mesh ref={monogram} position={[0, 1.75, 0]}>
-          <planeGeometry args={[0.8, 0.8]} />
+        <mesh ref={monogram} position={[0, 0.42, 0.28]}>
+          <planeGeometry args={[0.5, 0.5]} />
           <meshBasicMaterial map={beTex} transparent depthWrite={false} />
         </mesh>
       </group>
+
+      {/* Holographic scan sweep */}
+      <mesh ref={scan} rotation={[-Math.PI / 2, 0, 0]} visible={false}>
+        <planeGeometry args={[5.4, 2.2]} />
+        <meshBasicMaterial color="#22d3ee" transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      </mesh>
 
       {/* Cartridges + their expansion worlds */}
       {CARTRIDGES.map((c, i) => (
@@ -146,8 +171,12 @@ export default function Vault({ progressRef, reduce }) {
           {/* shell */}
           <mesh userData={{ shell: true }}>
             <boxGeometry args={[1.5, 0.95, 0.28]} />
-            <meshStandardMaterial color={c.color} metalness={0.4} roughness={0.5} emissive={c.color} emissiveIntensity={0.12} transparent />
+            <meshStandardMaterial color={c.color} metalness={0.4} roughness={0.5} emissive={c.color} emissiveIntensity={0.08} transparent />
           </mesh>
+          <lineSegments userData={{ shell: true }}>
+            <edgesGeometry args={[new THREE.BoxGeometry(1.5, 0.95, 0.28)]} />
+            <lineBasicMaterial color={c.color} transparent opacity={0.95} />
+          </lineSegments>
           <mesh position={[0, 0, 0.15]} userData={{ shell: true }}>
             <planeGeometry args={[1.36, 0.24]} />
             <meshBasicMaterial map={labels[i]} transparent />

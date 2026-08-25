@@ -191,3 +191,28 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
 - Workstation module plates rendered outside the tower (local/world space mix).
 - Mobile: 3D name typography overflowed narrow screens — setpiece now scales
   down and drops below the copy on phones.
+
+## [3.0.0] — 2026-08-26 — "Product Launch" visual redesign
+### Changed
+- Full Apple-keynote dark language: one continuous near-black void (#04070f),
+  no white chapters, no vignette, subtle bloom, huge editorial typography
+  (one gradient word per headline), thin-rule eyebrows, sequenced line beats.
+- Chapters 0–2 rebuilt around the textured CPU alone (ChipHero): centred hero
+  → slow-motion explode → parts align into an orbital ring beside huge stats.
+  The literal workstation setpiece removed.
+- Neural Core upgraded: iridescent glass (iGPU-friendly — transmission pass
+  removed), orbiting data motes, halo ring.
+- Vault: jewel-tone cartridges with edge glows, rack light strips, holographic
+  scan sweep. Map: darker island, ocean halo, route arcs from the home hub,
+  pin light beams.
+- Contact + banners restyled dark; navbar restyled dark; body background dark.
+### Fixed
+- Enroll Now button never hid after the Core chapter (photobombed later
+  chapters and the footer).
+- Community stats 2–3 never appeared (beat count mismatch).
+- Hero beats were scroll-gated at p=0 — hero now animates on load.
+- ChipHero missing useEffect import crashed the stage into its fallback.
+- Vault monogram referenced a removed `fade` variable (threw every frame).
+### Perf
+- Transmission pass removed, DPR capped 1.5, MSAA 0 + no SMAA — iGPU-friendly.
+- Verified 60fps in testing; per-frame material traverses cached.

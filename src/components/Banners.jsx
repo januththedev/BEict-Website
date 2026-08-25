@@ -11,7 +11,7 @@ function Banner({ banner }) {
       target={banner.target ?? undefined}
       rel={banner.target === '_blank' ? 'noopener noreferrer' : undefined}
       aria-label={banner.label}
-      className="group relative block overflow-hidden rounded-2xl border border-brand-100 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-600/20"
+      className="group relative block overflow-hidden rounded-2xl border border-white/10 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-600/20"
     >
       {imageOk ? (
         <img
@@ -58,10 +58,10 @@ function Banner({ banner }) {
  */
 export default function Banners() {
   return (
-    <section className="py-20 sm:py-24" aria-labelledby="banners-title">
+    <section className="bg-[#060b18] py-20 sm:py-24" aria-labelledby="banners-title">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <SectionHeading
+          <SectionHeading dark
             eyebrow='Announcements'
             title={<span id="banners-title">Latest from BEICT</span>}
             lead="Seminars, new batches and online events — tap through for details."

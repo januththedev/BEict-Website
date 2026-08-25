@@ -65,7 +65,7 @@ export default function Navbar() {
   const linkCls = (href) => {
     const isActive = active === href.slice(1)
     return `relative rounded-md px-1 py-2 text-sm font-medium transition-colors ${
-      isActive ? 'text-brand-700' : 'text-slate-600 hover:text-brand-700'
+      isActive ? 'text-white' : 'text-slate-400 hover:text-white'
     } after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:rounded-full after:bg-gradient-brand after:transition-all after:duration-300 ${
       isActive ? 'after:w-full' : 'after:w-0'
     }`
@@ -76,7 +76,7 @@ export default function Navbar() {
       ref={headerRef}
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled || open
-          ? 'bg-white/85 shadow-[0_8px_30px_-12px_rgba(12,27,58,0.15)] backdrop-blur-lg'
+          ? 'bg-[#04070f]/80 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.6)] backdrop-blur-lg border-b border-white/5'
           : 'bg-transparent'
       }`}
     >
@@ -112,7 +112,7 @@ export default function Navbar() {
         {/* Mobile hamburger */}
         <button
           type="button"
-          className="grid size-11 place-items-center rounded-lg text-ink transition-colors hover:bg-brand-50 lg:hidden"
+          className="grid size-11 place-items-center rounded-lg text-white transition-colors hover:bg-white/10 lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -130,7 +130,7 @@ export default function Navbar() {
 
       {/* Mobile menu panel */}
       {open && (
-        <div id="mobile-menu" className="border-t border-slate-100 bg-white/95 backdrop-blur-lg lg:hidden">
+        <div id="mobile-menu" className="border-t border-white/5 bg-[#04070f]/95 backdrop-blur-lg lg:hidden">
           <ul className="space-y-1 px-4 py-4">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>

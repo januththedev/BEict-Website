@@ -1,12 +1,12 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { CHAPTERS, SITE, TRACK_VH, VENUES, mapsUrlFor } from '../data/content.js'
 import { Button } from '../components/ui.jsx'
 
 /**
- * The full-site Z-scroll track: the persistent 3D stage behind absolutely
- * positioned chapter overlays. Each chapter owns a [start, end] slice of the
- * track's scroll progress; panels fade/translate via direct style writes
- * (avoids framer-motion v13's WAAPI scroll-timeline offset limits).
+ * Product-Launch chapters: one hero object in a void per chapter, sparse
+ * huge typography, sequenced line beats. No cards — text floats on black.
+ * Panels write styles from the shared progress MotionValue directly.
  */
 
 const StageCanvas = lazy(() => import('../three/StageCanvas.jsx'))
@@ -17,7 +17,8 @@ const smooth = (v) => {
   return t * t * (3 - 2 * t)
 }
 
-function Panel({ chapter, progress, isHero = false, align = 'left', tone = 'dark', width = 'max-w-xl', children }) {
+/** Sequenced line: fades/translates in during its slice of the chapter. */
+function Beat({ progress, chapter, index, count, className = '', children, as: Tag = 'p' }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -25,171 +26,151 @@ function Panel({ chapter, progress, isHero = false, align = 'left', tone = 'dark
     if (!el) return
     const { start, end } = chapter
     const span = end - start
-    const fade = span * 0.24
+    const slot = span / count
+    // The first beat is fully visible the moment the chapter begins.
+    const a = start + (index === 0 ? -slot : index * slot)
+    const b = a + slot * 1.6
     const apply = (p) => {
-      let o
-      if (isHero) {
-        o = 1 - smooth((p - (end - fade)) / (2 * fade))
-      } else {
-        o =
-          smooth((p - (start + fade * 0.35)) / (2 * fade)) *
-          (1 - smooth((p - (end - fade)) / (2 * fade)))
-      }
-      const local = clamp01((p - start) / span)
-      const y = (0.5 - local) * 70
+      const o = smooth((p - a) / (slot * 0.5)) * (1 - smooth((p - (end - span * 0.06)) / (span * 0.1)))
+      const y = (1 - smooth((p - a) / (slot * 0.5))) * 34
       el.style.opacity = clamp01(o).toFixed(3)
       el.style.transform = `translateY(${y.toFixed(1)}px)`
     }
     apply(progress.get())
     return progress.on('change', apply)
-  }, [chapter, progress, isHero])
+  }, [progress, chapter, index, count])
 
+  return (
+    <Tag ref={ref} className={className} style={{ opacity: 0, willChange: 'opacity, transform' }}>
+      {children}
+    </Tag>
+  )
+}
+
+function ChapterFrame({ chapter, children, align = 'left' }) {
   const alignCls =
-    align === 'center'
-      ? 'justify-center text-center'
-      : align === 'right'
-        ? 'justify-end'
-        : 'justify-start'
-
+    align === 'center' ? 'justify-center text-center' : align === 'right' ? 'justify-end' : 'justify-start'
   return (
     <div
       id={`chapter-${chapter.id}`}
       className="absolute inset-x-0"
       style={{ top: `${chapter.start * TRACK_VH}vh`, height: `${(chapter.end - chapter.start) * TRACK_VH}vh` }}
     >
-      <div className={`sticky top-0 flex h-screen items-center px-5 sm:px-10 lg:px-20 ${alignCls}`}>
-        <div
-          ref={ref}
-          style={{ willChange: 'opacity, transform' }}
-          className={`pointer-events-auto ${width} ${tone === 'dark' ? 'text-brand-50' : 'text-ink'}`}
-        >
-          {children}
-        </div>
-      </div>
+      <div className={`sticky top-0 flex h-screen items-center px-6 sm:px-14 lg:px-24 ${alignCls}`}>{children}</div>
     </div>
   )
 }
 
-function Eyebrow({ children, tone }) {
+function Eyebrow({ children }) {
   return (
-    <p
-      className={`mb-3 inline-block rounded-full border px-4 py-1 font-display text-xs font-semibold tracking-[0.18em] uppercase ${
-        tone === 'light'
-          ? 'border-brand-200 bg-brand-50 text-brand-700'
-          : 'border-white/15 bg-white/5 text-brand-200'
-      }`}
-    >
+    <p className="flex items-center gap-3 font-display text-xs font-semibold tracking-[0.3em] text-cyan-300/90 uppercase">
+      <span className="inline-block h-px w-10 bg-cyan-300/60" aria-hidden />
       {children}
     </p>
   )
 }
 
-function GlassCard({ children, className = '' }) {
-  return (
-    <div className={`rounded-2xl border border-white/10 bg-navy-950/55 p-6 backdrop-blur-md sm:p-8 ${className}`}>
-      {children}
-    </div>
-  )
-}
+const H1 = 'font-display font-extrabold tracking-[-0.03em] text-white leading-[0.98]'
+const H2 = 'font-display font-extrabold tracking-[-0.02em] text-white leading-[1.02]'
+const LEAD = 'text-lg leading-relaxed text-slate-400 sm:text-xl'
 
-/* ------------------------------- chapters ------------------------------- */
+/* -------------------------------- chapters ------------------------------- */
 
-function HeroChapter({ progress }) {
+function HeroChapter() {
   const ch = CHAPTERS[0]
+  const reduce = Boolean(useReducedMotion())
+  // The hero animates ON LOAD (staggered), not on scroll — the visitor lands
+  // here and must see everything immediately.
+  const item = (i) => ({
+    initial: reduce ? { opacity: 1 } : { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7, delay: 0.15 + i * 0.16, ease: [0.22, 1, 0.36, 1] },
+  })
   return (
-    <Panel chapter={ch} progress={progress} isHero tone="light" width="max-w-2xl">
-      <Eyebrow tone="light">G.C.E. Advanced Level · ICT Classes</Eyebrow>
-      <h1 className="mt-4 font-display text-4xl leading-[1.08] font-extrabold tracking-tight sm:text-5xl xl:text-6xl">
-        Information &amp; <span className="text-gradient-brand">Communication</span> Technology
-      </h1>
-      <p className="mt-4 font-display text-lg font-semibold text-brand-800">
-        Conducted by {SITE.owner}
-        <span className="block text-sm font-medium text-slate-500">“{SITE.tagline}”</span>
-      </p>
-      <p className="mt-3 max-w-lg text-base leading-relaxed text-slate-600 sm:text-lg">
-        Structured theory, focused revision and six class hubs across the island —
-        extended online through the BEICT learning system.
-      </p>
-      <div className="mt-7 flex flex-wrap items-center gap-3.5">
-        <Button href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 text-base">
-          Get Started Learning Now
-        </Button>
-        <Button href="#contact" variant="secondary" className="px-7 py-3.5 text-base">
-          Contact Bhanuka Sir
-        </Button>
+    <ChapterFrame chapter={ch} align="left">
+      <div className="max-w-4xl">
+        <motion.div {...item(0)} className="mb-6">
+          <Eyebrow>G.C.E. Advanced Level · ICT</Eyebrow>
+        </motion.div>
+        <motion.h1 {...item(1)} className={`${H1} text-[clamp(2.6rem,7vw,6.2rem)]`}>
+          A/L ICT.
+          <span className="block bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent">
+            Taught right.
+          </span>
+        </motion.h1>
+        <motion.p {...item(2)} className={`${LEAD} mt-6 max-w-xl`}>
+          Structured theory, focused revision and six class hubs across the island —
+          extended online through the BEICT learning system.
+        </motion.p>
+        <motion.div {...item(3)} className="mt-9 flex flex-wrap gap-4">
+          <Button href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="px-8 py-4 text-base">
+            Start learning
+          </Button>
+          <Button href="#contact" variant="ghostDark" className="px-8 py-4 text-base">
+            Contact Bhanuka Sir
+          </Button>
+        </motion.div>
       </div>
-      <p className="mt-3 font-sinhala text-sm text-slate-500">{SITE.sinhalaLmsInvite}</p>
-    </Panel>
+    </ChapterFrame>
   )
 }
 
 function IdentityChapter({ progress }) {
   const ch = CHAPTERS[1]
   return (
-    <Panel chapter={ch} progress={progress} align="left" width="max-w-lg">
-      <GlassCard>
-        <Eyebrow>About</Eyebrow>
-        <div className="mt-4 flex items-center gap-4">
-          <img
-            src="/images/bhanuka-sir.png"
-            alt={`Portrait of ${SITE.owner}`}
-            width="96"
-            height="96"
-            loading="lazy"
-            className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-white/15"
-          />
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">Meet Bhanuka Sir</h2>
-            <p className="text-sm text-brand-200">{SITE.tagline}</p>
+    <ChapterFrame chapter={ch} align="right">
+      <div className="max-w-xl">
+        <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
+          <Eyebrow>Who is Bhanuka Sir</Eyebrow>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={1} count={3} as="h2" className={`${H2} text-[clamp(2rem,4.5vw,3.8rem)]`}>
+          The teacher behind
+          <span className="bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent"> the machine.</span>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={2} count={3} as="div" className={`mt-6 ${LEAD}`}>
+          <div className="flex items-center gap-5">
+            <img
+              src="/images/bhanuka-sir.png"
+              alt={`Portrait of ${SITE.owner}`}
+              width="84"
+              height="84"
+              loading="lazy"
+              className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-white/10"
+            />
+            <p>
+              <span className="font-semibold text-white">{SITE.owner}</span> — {SITE.tagline}.
+              Teaching {SITE.subject} for {SITE.level}, from Horana to the whole island.
+            </p>
           </div>
-        </div>
-        <p className="mt-4 text-sm leading-relaxed text-brand-100/85 sm:text-base">
-          {SITE.owner} teaches {SITE.subject} for {SITE.level} students — from Horana
-          to the island, in halls and online. The workstation behind this panel is
-          where every lesson is built.
-        </p>
-        <ul className="mt-5 space-y-2.5 text-sm text-brand-100/85">
-          {['Structured theory for the full A/L ICT syllabus', 'Dedicated revision batches (2026 & 2027 A/L)', 'BEICT අන්තර්ජාල ඉගෙනුම් පද්ධතිය — online, always'].map((point) => (
-            <li key={point} className="flex items-start gap-2.5">
-              <span className="mt-1 size-1.5 shrink-0 rounded-full bg-cyan-300" aria-hidden />
-              {point}
-            </li>
-          ))}
-        </ul>
-      </GlassCard>
-    </Panel>
+        </Beat>
+      </div>
+    </ChapterFrame>
   )
 }
 
 function TrackChapter({ progress }) {
   const ch = CHAPTERS[2]
-  const stats = [
-    { v: '152K+', l: 'Facebook followers' },
-    { v: '80K+', l: 'YouTube subscribers · 332 lessons' },
-    { v: '6', l: 'island-wide class hubs' },
-    { v: '2026 & 2027', l: 'A/L batches in class now' },
+  const beats = [
+    { v: '152,000+', l: 'people follow his teaching on Facebook' },
+    { v: '80,000+', l: 'YouTube subscribers · 332 uploaded lessons' },
+    { v: '6', l: 'class hubs, from Kurunegala to Kalutara' },
   ]
   return (
-    <Panel chapter={ch} progress={progress} align="right" width="max-w-lg">
-      <GlassCard>
-        <Eyebrow>Track record</Eyebrow>
-        <h2 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
-          The numbers behind the name
-        </h2>
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          {stats.map((s) => (
-            <div key={s.l} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-              <p className="font-display text-xl font-extrabold text-white sm:text-2xl">{s.v}</p>
-              <p className="mt-0.5 text-xs text-brand-100/70">{s.l}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-4 text-xs leading-relaxed text-brand-100/60">
-          Every badge and module flying beside this card is a real syllabus unit —
-          taught in class, revised online, proven across hundreds of uploaded lessons.
-        </p>
-      </GlassCard>
-    </Panel>
+    <ChapterFrame chapter={ch} align="left">
+      <div className="max-w-3xl">
+        <Beat progress={progress} chapter={ch} index={0} count={4} as="div" className="mb-8">
+          <Eyebrow>Track record</Eyebrow>
+        </Beat>
+        {beats.map((b, i) => (
+          <Beat key={b.l} progress={progress} chapter={ch} index={i + 1} count={4} as="div" className="mb-7 border-l-2 border-cyan-400/40 pl-6">
+            <p className="font-display text-[clamp(2.4rem,5.5vw,4.6rem)] font-extrabold leading-none tracking-tight text-white">
+              {b.v}
+            </p>
+            <p className="mt-2 text-base text-slate-400">{b.l}</p>
+          </Beat>
+        ))}
+      </div>
+    </ChapterFrame>
   )
 }
 
@@ -197,113 +178,108 @@ function CoreChapter({ progress }) {
   const ch = CHAPTERS[3]
   const btnRef = useRef(null)
 
-  // The Enroll trigger appears as the core condenses (last 20% of the chapter).
   useEffect(() => {
     const el = btnRef.current
     if (!el) return
     const { start, end } = ch
     const apply = (p) => {
       const local = (p - start) / (end - start)
-      const o = clamp01((local - 0.78) / 0.16)
+      // appears at 80% of the chapter, gone shortly after it ends
+      const o = clamp01((local - 0.8) / 0.14) * (1 - clamp01((local - 1.02) / 0.06))
       el.style.opacity = o.toFixed(3)
       el.style.pointerEvents = o > 0.5 ? 'auto' : 'none'
-      el.style.transform = `translateY(${(1 - o) * 24}px) scale(${0.9 + o * 0.1})`
+      el.style.transform = `translateY(${(1 - o) * 26}px) scale(${0.92 + o * 0.08})`
     }
     apply(progress.get())
     return progress.on('change', apply)
   }, [progress, ch])
 
   return (
-    <Panel chapter={ch} progress={progress} align="left" width="max-w-md">
-      <GlassCard>
-        <Eyebrow>The Teacher’s Mind</Eyebrow>
-        <h2 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
-          Philosophy, peeled open
-        </h2>
-        <ul className="mt-5 space-y-4 text-sm leading-relaxed text-brand-100/85">
-          <li>
-            <span className="font-display font-bold text-cyan-300">The shell —</span> a
-            Horana-based ICT teacher covering the full G.C.E. A/L syllabus, in halls
-            across the island and on YouTube for everyone else.
-          </li>
-          <li>
-            <span className="font-display font-bold text-cyan-300">The circuits —</span>{' '}
-            Theory explained simply → revised under exam pressure → practised until
-            the logic sticks.
-          </li>
-          <li>
-            <span className="font-display font-bold text-cyan-300">The core —</span> a
-            quarter-million-strong community learning together, every single week.
-          </li>
-        </ul>
-      </GlassCard>
-      {/* Enroll trigger — appears as the 3D core condenses */}
-      <div ref={btnRef} className="fixed inset-x-0 bottom-[14%] z-20 flex justify-center opacity-0" style={{ pointerEvents: 'none' }}>
-        <Button href="#contact" className="px-9 py-4 text-base shadow-glow">
-          Enroll Now
-          <span aria-hidden>→</span>
+    <ChapterFrame chapter={ch} align="left">
+      <div className="max-w-xl">
+        <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
+          <Eyebrow>Inside the teacher’s mind</Eyebrow>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={1} count={3} as="h2" className={`${H2} text-[clamp(2rem,4.5vw,3.8rem)]`}>
+          Peel it back.
+          <span className="block text-slate-500">Layer by layer.</span>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={2} count={3} as="div" className={`mt-6 ${LEAD} space-y-3`}>
+          <p>
+            <span className="text-cyan-300">The shell</span> — full A/L ICT coverage, in
+            halls across the island and on YouTube for everyone.
+          </p>
+          <p>
+            <span className="text-cyan-300">The circuits</span> — theory, revision,
+            practice. The same loop, every batch, until it sticks.
+          </p>
+          <p>
+            <span className="text-cyan-300">The core</span> — a quarter-million-strong
+            community, learning together every week.
+          </p>
+        </Beat>
+      </div>
+      <div
+        ref={btnRef}
+        className="fixed inset-x-0 bottom-[15%] z-20 flex justify-center opacity-0"
+        style={{ pointerEvents: 'none' }}
+      >
+        <Button href="#contact" className="px-10 py-4 text-lg shadow-glow">
+          Enroll Now <span aria-hidden>→</span>
         </Button>
       </div>
-    </Panel>
+    </ChapterFrame>
   )
 }
 
 function VaultChapter({ progress }) {
   const ch = CHAPTERS[4]
   return (
-    <Panel chapter={ch} progress={progress} align="left" width="max-w-md">
-      <GlassCard>
-        <Eyebrow>Syllabus Vault</Eyebrow>
-        <h2 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
-          Three cartridges. One syllabus.
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-brand-100/85 sm:text-base">
-          Everything the A/L ICT exam asks — hardware, networks and software —
-          ejected cartridge by cartridge as you scroll.
-        </p>
-        <ul className="mt-4 space-y-1.5 text-xs text-brand-100/65">
-          <li>▸ Hardware &amp; Architecture — CPU, memory, logic</li>
-          <li>▸ Networking &amp; Security — the OSI stack</li>
-          <li>▸ Software &amp; Algorithms — code and binary</li>
-        </ul>
-      </GlassCard>
-    </Panel>
+    <ChapterFrame chapter={ch} align="left">
+      <div className="max-w-xl">
+        <Beat progress={progress} chapter={ch} index={0} count={2} as="div" className="mb-5">
+          <Eyebrow>Syllabus Vault</Eyebrow>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={1} count={2} as="h2" className={`${H2} text-[clamp(2rem,4.5vw,3.8rem)]`}>
+          Three cartridges.
+          <span className="block bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent">
+            One syllabus.
+          </span>
+        </Beat>
+      </div>
+    </ChapterFrame>
   )
 }
 
 function MapChapter({ progress }) {
   const ch = CHAPTERS[5]
   return (
-    <Panel chapter={ch} progress={progress} align="left" width="max-w-md">
-      <GlassCard>
-        <Eyebrow>Class Centres</Eyebrow>
-        <h2 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
-          Six hubs. One island.
-        </h2>
-        <p className="mt-2 text-sm text-brand-100/75">
-          Tap a pin on the map — or a hall below — to open its exact location on
-          Google Maps.
-        </p>
-        <ul className="mt-4 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+    <ChapterFrame chapter={ch} align="left">
+      <div className="max-w-xl">
+        <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
+          <Eyebrow>Class centres</Eyebrow>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={1} count={3} as="h2" className={`${H2} text-[clamp(2rem,4.5vw,3.8rem)]`}>
+          Six hubs.
+          <span className="block bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent">
+            One island.
+          </span>
+        </Beat>
+        <Beat progress={progress} chapter={ch} index={2} count={3} as="div" className="mt-6 flex flex-wrap gap-2">
           {VENUES.map((v) => (
-            <li key={v.name}>
-              <a
-                href={mapsUrlFor(v)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-brand-50 transition-colors hover:border-cyan-300/50 hover:bg-white/10"
-              >
-                <span className="text-orange-400" aria-hidden>
-                  ⚲
-                </span>
-                {v.name}
-                <span className="font-normal text-brand-100/60">· {v.town}</span>
-              </a>
-            </li>
+            <a
+              key={v.name}
+              href={mapsUrlFor(v)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:border-cyan-300/60 hover:text-white"
+            >
+              {v.name} · {v.town}
+            </a>
           ))}
-        </ul>
-      </GlassCard>
-    </Panel>
+        </Beat>
+      </div>
+    </ChapterFrame>
   )
 }
 
@@ -315,50 +291,47 @@ function CommunityChapter({ progress }) {
     { v: '713K+', l: 'TikTok likes', href: SITE.tiktokUrl, plat: 'TikTok' },
   ]
   return (
-    <Panel chapter={ch} progress={progress} align="center" width="max-w-3xl">
-      <Eyebrow tone="dark">The BEICT community</Eyebrow>
-      <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
-        A quarter of a million learners follow along
-      </h2>
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        {stats.map((s) => (
-          <a
-            key={s.plat}
-            href={s.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-2xl border border-white/10 bg-navy-950/55 p-5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-cyan-300/40"
-          >
-            <p className="font-display text-3xl font-extrabold text-white">{s.v}</p>
-            <p className="mt-1 text-xs text-brand-100/70">{s.l}</p>
-            <p className="mt-2 text-[11px] font-semibold tracking-wide text-cyan-300 uppercase">
-              {s.plat} ↗
-            </p>
-          </a>
-        ))}
+    <ChapterFrame chapter={ch} align="center">
+      <div className="w-full max-w-4xl">
+        <Beat progress={progress} chapter={ch} index={0} count={2} as="div" className="mb-10 flex justify-center">
+          <Eyebrow>The BEICT community</Eyebrow>
+        </Beat>
+        <div className="grid gap-10 sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <Beat key={s.plat} progress={progress} chapter={ch} index={i + 1} count={4} as="div">
+              <a href={s.href} target="_blank" rel="noopener noreferrer" className="group block">
+                <p className="font-display text-[clamp(3rem,6vw,5rem)] font-extrabold leading-none tracking-tight text-white">
+                  {s.v}
+                </p>
+                <p className="mt-2 text-sm text-slate-500">{s.l}</p>
+                <p className="mt-3 text-[11px] font-semibold tracking-[0.2em] text-cyan-300 uppercase">
+                  {s.plat} ↗
+                </p>
+              </a>
+            </Beat>
+          ))}
+        </div>
       </div>
-    </Panel>
+    </ChapterFrame>
   )
 }
 
 function GalleryChapter({ progress }) {
   const ch = CHAPTERS[7]
   return (
-    <Panel chapter={ch} progress={progress} align="center" width="max-w-lg">
-      <div>
-        <Eyebrow tone="dark">Gallery</Eyebrow>
-        <h2 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
-          Inside the classroom
-        </h2>
-        <p className="mt-2 text-sm text-brand-100/75">
-          Moments from BEICT classes — theory, revision and everything in between.
-        </p>
+    <ChapterFrame chapter={ch} align="center">
+      <div className="max-w-lg">
+        <Beat progress={progress} chapter={ch} index={0} count={1} as="div" className="flex flex-col items-center gap-4">
+          <Eyebrow>Gallery</Eyebrow>
+          <h2 className={`${H2} text-[clamp(1.8rem,4vw,3.2rem)]`}>Inside the classroom</h2>
+          <p className={LEAD}>Moments from BEICT classes — fly through them.</p>
+        </Beat>
       </div>
-    </Panel>
+    </ChapterFrame>
   )
 }
 
-/* ------------------------------ the track ------------------------------ */
+/* -------------------------------- the track ------------------------------- */
 
 const CHAPTER_VIEWS = {
   hero: HeroChapter,
@@ -371,18 +344,9 @@ const CHAPTER_VIEWS = {
   gallery: GalleryChapter,
 }
 
-export default function ZScrollTrack({ progress, progressRef, reduce, onStageNear }) {
-  const stageRef = useRef(null)
-
-  // Mount the heavy 3D stage once the visitor is anywhere near the page top
-  // (which is immediately — the track starts at the hero) — but keep the
-  // lazy boundary OUTSIDE the canvas tree.
-  useEffect(() => {
-    onStageNear?.()
-  }, [onStageNear])
-
+export default function ZScrollTrack({ progress, progressRef, reduce }) {
   return (
-    <div ref={stageRef} className="relative" style={{ height: `${TRACK_VH}vh` }}>
+    <div className="relative" style={{ height: `${TRACK_VH}vh` }}>
       <Suspense fallback={null}>
         <StageCanvas progressRef={progressRef} reduce={reduce} />
       </Suspense>
