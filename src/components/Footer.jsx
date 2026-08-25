@@ -90,7 +90,17 @@ export default function Footer() {
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} {SITE.owner} · BEICT. All rights reserved.
           </p>
-          <p className="text-xs text-slate-500">beict.lk</p>
+          <p className="text-xs text-slate-500">
+            Developed by{' '}
+            <a
+              href="https://www.januth.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-400 underline decoration-slate-600 underline-offset-2 transition-colors hover:text-brand-300 hover:decoration-brand-400"
+            >
+              Januth Nimnal
+            </a>
+          </p>
         </div>
       </div>
     </footer>

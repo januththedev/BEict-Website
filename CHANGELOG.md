@@ -137,3 +137,8 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
 - No backend: contact form composes email in the visitor's mail app.
 - No class times/pricing (never published on the source site — not invented).
 - `THREE.Clock` deprecation warning originates inside @react-three/drei.
+
+## [Unreleased]
+### Added
+- Footer credit: “Developed by Januth Nimnal” linking to www.januth.dev.
+- Git repository initialised; deployment via Vercel (auto-deploys on push).
