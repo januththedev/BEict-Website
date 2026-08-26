@@ -39,7 +39,14 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
           onReady(loadLocalOverrides() ?? (validateContent({}) as CmsContent))
           return
         }
-        setError('Wrong password. Try again.')
+        let message = 'Wrong password. Try again.'
+        try {
+          const data = (await res.json()) as { error?: string }
+          if (data.error) message = data.error
+        } catch {
+          /* keep default message */
+        }
+        setError(message)
         return
       }
       const data = await fetch('/api/content', { credentials: 'include' }).then((r) => r.json())
