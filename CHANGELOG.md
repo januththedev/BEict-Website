@@ -2,10 +2,11 @@
 
 All notable changes to this project are documented here.
 
-## 1.2.0-beta — 2026-08-26 (LOCAL ONLY — not pushed)
+## 1.2.0-beta — 2026-08-26
 
-Design-soul pass on top of 1.1.0-beta, per owner feedback. Revert point for the whole
-beta remains `2c59529`.
+Design-soul pass on top of 1.1.0-beta, per owner feedback. (Beta began with the
+instruction "don't push; revert point `2c59529`" — the owner later asked for everything
+to be pushed, so all beta commits are on GitHub as of `7629e5f`.)
 
 ### Changed
 - **Removed the "BEICT Core" 3D section** entirely (component, scene, topic data) —
@@ -27,10 +28,9 @@ beta remains `2c59529`.
   accents and highlight marks all verified rendering; glass mobile menu opens.
 - Screenshots: `qa/qa-beta2-hero-glass.png`, `qa/qa-beta2-about.png`.
 
-## 1.1.0-beta — 2026-08-26 (LOCAL ONLY — not pushed)
+## 1.1.0-beta — 2026-08-26
 
-Interactive/WebGL upgrade. **Beta per owner instruction: committed locally, not pushed to
-GitHub. Revert point is `2c59529`** (`git reset --hard 2c59529` restores the pre-beta site).
+Interactive/WebGL upgrade.
 
 ### Added
 - **Interactive WebGL hero backdrop** (`src/three/HeroField.ts`): pointer-parallaxed
