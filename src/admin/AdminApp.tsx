@@ -34,7 +34,7 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
         body: JSON.stringify({ password }),
       })
       if (!res.ok) {
-        // No API in this environment (local dev) — accept anything, use local data.
+        // No API in this environment — accept anything, use local data.
         if (res.status === 404 || res.status === 501) {
           onReady(loadLocalOverrides() ?? (validateContent({}) as CmsContent))
           return
@@ -42,9 +42,13 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
         let message = 'Wrong password. Try again.'
         try {
           const data = (await res.json()) as { error?: string }
-          if (data.error) message = data.error
+          if (res.status === 500 && data.error?.includes('ADMIN_PASSWORD')) {
+            message = 'Server has no ADMIN_PASSWORD set — add it in Vercel and redeploy.'
+          } else if (data.error) {
+            message = data.error
+          }
         } catch {
-          /* keep default message */
+          message = `Login failed (HTTP ${res.status})`
         }
         setError(message)
         return
