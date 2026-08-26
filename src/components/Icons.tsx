@@ -143,3 +143,109 @@ export function TiktokGlyph(props: IconProps) {
     </svg>
   )
 }
+
+// ---------- extra icons for the CMS icon picker ----------
+
+export function StarIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </StrokeIcon>
+  )
+}
+
+export function UsersIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </StrokeIcon>
+  )
+}
+
+export function CalendarIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </StrokeIcon>
+  )
+}
+
+export function GlobeIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </StrokeIcon>
+  )
+}
+
+export function CodeIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </StrokeIcon>
+  )
+}
+
+export function AwardIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <circle cx="12" cy="8" r="7" />
+      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+    </StrokeIcon>
+  )
+}
+
+export function ZapIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </StrokeIcon>
+  )
+}
+
+export function GraduationIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M22 10 12 5 2 10l10 5 10-5z" />
+      <path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" />
+    </StrokeIcon>
+  )
+}
+
+// ---------- registry (used by the CMS icon picker) ----------
+
+export const ICON_REGISTRY = {
+  book: { label: 'Book / lessons', Component: BookOpenIcon },
+  monitor: { label: 'Monitor / online', Component: MonitorIcon },
+  repeat: { label: 'Repeat / revision', Component: RepeatIcon },
+  phone: { label: 'Phone', Component: PhoneIcon },
+  mail: { label: 'Mail', Component: MailIcon },
+  clock: { label: 'Clock / hours', Component: ClockIcon },
+  chat: { label: 'Chat / WhatsApp', Component: ChatIcon },
+  send: { label: 'Send', Component: SendIcon },
+  star: { label: 'Star', Component: StarIcon },
+  users: { label: 'Users / students', Component: UsersIcon },
+  calendar: { label: 'Calendar', Component: CalendarIcon },
+  globe: { label: 'Globe', Component: GlobeIcon },
+  code: { label: 'Code', Component: CodeIcon },
+  award: { label: 'Award', Component: AwardIcon },
+  zap: { label: 'Zap / energy', Component: ZapIcon },
+  graduation: { label: 'Graduation', Component: GraduationIcon },
+} as const
+
+export type IconName = keyof typeof ICON_REGISTRY
+
+export function IconByName({ name, ...props }: { name: string } & IconProps) {
+  const entry = ICON_REGISTRY[name as IconName]
+  const Component = entry?.Component ?? BookOpenIcon
+  return <Component {...props} />
+}

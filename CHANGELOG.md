@@ -2,6 +2,45 @@
 
 All notable changes to this project are documented here.
 
+## 2.0.0 — 2026-08-26 · Aug update — built-in CMS (Wix-style structured builder)
+
+The site now has its own click-to-edit CMS at **`/admin`**, powered by the admin
+password stored in Vercel environment variables (never in the code).
+
+### Added
+- **Click-to-edit everything**: 86+ text fields across every section — click the text
+  on the real page and type. Long text edits inline (multiline) or via the fields panel.
+- **Add / remove / duplicate / reorder**: batch cards, LMS point cards, banner cards,
+  community stats, lesson videos, about facts — each list has "+ Add" and per-item
+  ↑ ↓ ⧉ ✕ controls.
+- **Image uploads**: banner images upload to Vercel Blob from the admin
+  (png/jpg/webp/gif/svg, ≤5 MB) with preview/replace/reset.
+- **Icon picker**: any icon slot swaps between 16 built-in icons.
+- **Links**: button/card/social/phone/WhatsApp/LMS targets are editable fields.
+- **Sections panel**: show/hide and reorder whole sections; per-section reset to
+  defaults; hidden sections keep their content.
+- **Auth**: `POST /api/login` compares against the `ADMIN_PASSWORD` env variable
+  server-side (timing-safe) and issues a signed HttpOnly session cookie (7 days,
+  per-IP rate limiting). Password never reaches the browser.
+- **Storage**: validated content JSON in Vercel Blob (`cms/content.json`); the public
+  site picks up published changes within seconds (edge-cached GET).
+- **Structure lock**: `PUT /api/content` validates every payload against
+  `src/cms/schema.ts` — unknown fields are dropped, URL schemes whitelisted
+  (https/tel/mailto/#//), list counts capped. No add/delete/restyle of layout is
+  possible from the CMS.
+- Local dev fallback: without Vercel env vars, content persists to localStorage and
+  uploads become inline data URLs — the full admin flow works offline.
+- `vercel.json` (SPA rewrite for /admin), `.env.example`, `README-CMS.md` with the
+  exact Vercel dashboard setup (Blob store + 3 env vars + redeploy).
+- `package.json` version → **2.0.0**.
+
+### QA (2026-08-26, production build, Chromium)
+- Public site pixel-identical when logged out (defaults render; no edit chrome).
+- Admin: login (dev fallback), inline text edit committed on blur, unsaved-changes
+  badge + beforeunload guard, add card 3→4 and delete 4→3, icon picker (16 icons),
+  section hide/show, publish → localStorage persistence → public site shows the edit.
+- 0 unexpected console errors (only the expected 404s for /api/* in local dev).
+
 ## 1.2.0-beta — 2026-08-26
 
 Design-soul pass on top of 1.1.0-beta, per owner feedback. (Beta began with the

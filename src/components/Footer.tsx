@@ -1,10 +1,13 @@
-import { NAV_LINKS, SITE } from '../data/content'
-import { FacebookIcon, YoutubeIcon } from './Icons'
+import { useCms } from '../cms/CmsProvider'
+import { T } from '../cms/edit'
+import { ArrowUpRightIcon, FacebookIcon, YoutubeIcon } from './Icons'
 import { Logo } from './Logo'
-import { ArrowUpRightIcon } from './Icons'
 
 export function Footer() {
-  const year = new Date().getFullYear()
+  const cms = useCms()
+  const { c } = cms
+  const s = c.site
+
   return (
     <footer className="bg-navy-950 text-brand-100/80" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">
@@ -13,13 +16,10 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:gap-16">
         <div className="flex flex-col items-start gap-4">
           <Logo variant="dark" />
-          <p className="max-w-xs text-sm leading-relaxed">
-            {SITE.subject} for the {SITE.level} — in Sinhala medium. Classes plus a complete
-            online learning system.
-          </p>
+          <T p="footer.blurb" as="p" multiline className="block max-w-xs text-sm leading-relaxed" />
           <div className="flex gap-3">
             <a
-              href={SITE.facebookUrl}
+              href={s.facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="BEICT on Facebook (opens in a new tab)"
@@ -28,7 +28,7 @@ export function Footer() {
               <FacebookIcon className="h-4.5 w-4.5" />
             </a>
             <a
-              href={SITE.youtubeUrl}
+              href={s.youtubeUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Bhanuka Ekanayaka on YouTube (opens in a new tab)"
@@ -37,7 +37,7 @@ export function Footer() {
               <YoutubeIcon className="h-4.5 w-4.5" />
             </a>
             <a
-              href={SITE.whatsappUrl}
+              href={s.whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="BEICT on WhatsApp (opens in a new tab)"
@@ -53,8 +53,8 @@ export function Footer() {
         <nav aria-label="Footer">
           <h3 className="font-display text-sm font-bold uppercase tracking-wider text-white">Explore</h3>
           <ul className="mt-4 grid gap-2.5 text-sm">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
+            {c.nav.links.map((link) => (
+              <li key={link.href + link.label}>
                 <a href={link.href} className="transition-colors hover:text-white">
                   {link.label}
                 </a>
@@ -70,38 +70,36 @@ export function Footer() {
           <ul className="mt-4 grid gap-2.5 text-sm">
             <li>
               <a
-                href={SITE.lmsUrl}
+                href={s.lmsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 font-semibold text-white transition-colors hover:text-brand-300"
               >
-                LMS Login — lms.beict.lk <ArrowUpRightIcon className="h-3.5 w-3.5" />
+                {s.lmsLabel} — lms.beict.lk <ArrowUpRightIcon className="h-3.5 w-3.5" />
               </a>
             </li>
             <li>
-              <a href={SITE.phoneTel} className="transition-colors hover:text-white">
-                {SITE.phoneDisplay}
+              <a href={s.phoneHref} className="transition-colors hover:text-white">
+                {s.phoneDisplay}
               </a>
             </li>
             <li>
-              <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-white">
-                {SITE.email}
+              <a href={`mailto:${s.email}`} className="transition-colors hover:text-white">
+                {s.email}
               </a>
             </li>
-            <li>{SITE.hours}</li>
+            <li>{s.hours}</li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs sm:flex-row sm:px-6">
+          <T p="footer.copyright" as="p" />
           <p>
-            © {year} {SITE.name} — {SITE.longName}. All rights reserved.
-          </p>
-          <p>
-            Online learning:{' '}
+            {c.footer.onlineLabel}{' '}
             <a
-              href={SITE.lmsUrl}
+              href={s.lmsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-brand-200 underline underline-offset-2 hover:text-white"
@@ -112,14 +110,14 @@ export function Footer() {
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-5 text-center text-xs sm:px-6">
           <p className="text-brand-100/60">
-            Developed by{' '}
+            {c.footer.creditPre}{' '}
             <a
-              href={SITE.developerUrl}
+              href={s.developerUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-brand-200 underline underline-offset-2 transition-colors hover:text-white"
             >
-              {SITE.developerName}
+              {s.developerName}
             </a>
           </p>
         </div>

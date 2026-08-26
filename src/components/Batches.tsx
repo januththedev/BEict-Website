@@ -1,38 +1,35 @@
-import { BATCHES, SITE } from '../data/content'
-import type { Batch } from '../data/content'
-import { ArrowUpRightIcon, BookOpenIcon, MonitorIcon, RepeatIcon } from './Icons'
+import { useCms } from '../cms/CmsProvider'
+import { AddItemButton, EditableIcon, ItemControls, T } from '../cms/edit'
+import { ArrowUpRightIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 import { useTilt } from '../hooks/useTilt'
 
-const BATCH_ICONS = {
-  'al-theory': BookOpenIcon,
-  'repeat-revision': RepeatIcon,
-  'online-resources': MonitorIcon,
-} as const
-
-function BatchCard({ batch, delay }: { batch: Batch; delay: number }) {
-  const Icon = BATCH_ICONS[batch.id as keyof typeof BATCH_ICONS] ?? BookOpenIcon
+function BatchCard({ path, index }: { path: string; index: number }) {
+  const cms = useCms()
+  const card = cms.c.batches.cards[index]
   const tilt = useTilt<HTMLElement>(5)
+
   return (
-    <Reveal delay={delay} className="h-full">
+    <Reveal delay={index * 90} className="h-full">
       <article
         ref={tilt}
-        className="group flex h-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lift"
+        className="cms-item group flex h-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lift"
       >
+        <ItemControls path={path} removable={cms.c.batches.cards.length > 1} />
         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
-          <Icon className="h-6 w-6" />
+          <EditableIcon path={`${path}.icon`} name={card.icon} className="h-6 w-6" />
         </span>
         <div className="flex-1">
-          <h3 className="font-display text-lg font-bold text-ink">{batch.name}</h3>
-          <p className="mt-2 text-sm leading-relaxed">{batch.note}</p>
+          <T p={`${path}.name`} as="h3" className="font-display text-lg font-bold text-ink" />
+          <T p={`${path}.note`} as="p" multiline className="mt-2 block text-sm leading-relaxed" />
         </div>
         <a
-          href={SITE.lmsUrl}
+          href={cms.c.site.lmsUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-brand-700 transition-colors hover:text-brand-600"
         >
-          Open on the LMS
+          {cms.c.batches.cardLinkLabel}
           <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
         </a>
@@ -42,29 +39,37 @@ function BatchCard({ batch, delay }: { batch: Batch; delay: number }) {
 }
 
 export function Batches() {
+  const cms = useCms()
+  const b = cms.c.batches
+
   return (
     <section id="batches" className="bg-ice py-20 sm:py-24" aria-labelledby="batches-title">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           id="batches-title"
           eyebrow="Batches"
-          title="Find your place on the learning system"
-          lede="Courses are organised by examination batch inside the BEICT online learning system. Sign in to see the batches currently open for enrolment."
+          titleKey="batches.title"
+          ledeKey="batches.lede"
           variant="slide-x"
           from="left"
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {BATCHES.map((batch, i) => (
-            <BatchCard key={batch.id} batch={batch} delay={i * 90} />
+          {b.cards.map((_, i) => (
+            <BatchCard key={i} path={`batches.cards.${i}`} index={i} />
           ))}
         </div>
+        <AddItemButton
+          listPath="batches.cards"
+          template={{ icon: 'graduation', name: 'New batch', note: 'Describe this batch for students.' }}
+          label="Add batch card"
+        />
 
         <Reveal delay={280}>
           <p className="mt-8 text-center text-xs text-slate-body">
-            Batch categories shown here reflect the course categories published on{' '}
-            <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600">
-              lms.beict.lk
+            <T p="batches.captionPre" />{' '}
+            <a href={cms.c.site.lmsUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600">
+              <T p="batches.captionLinkLabel" />
             </a>
             . Current availability is confirmed inside the learning system.
           </p>

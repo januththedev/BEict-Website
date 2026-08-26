@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
-import { NAV_LINKS, SITE } from '../data/content'
+import { useCms } from '../cms/CmsProvider'
 import { Logo } from './Logo'
 import { ArrowUpRightIcon, CloseIcon, MenuIcon } from './Icons'
 
-const lmsLinkProps = {
-  href: SITE.lmsUrl,
-  target: '_blank',
-  rel: 'noopener noreferrer',
-} as const
-
 export function Navbar() {
+  const cms = useCms()
+  const { c } = cms
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeHref, setActiveHref] = useState('')
@@ -21,11 +17,10 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Scrollspy: highlight the nav link of the section currently in view
   useEffect(() => {
-    const sections = NAV_LINKS.map((l) => document.getElementById(l.href.slice(1))).filter(
-      (el): el is HTMLElement => el !== null,
-    )
+    const sections = c.nav.links
+      .map((l) => document.getElementById(l.href.slice(1)))
+      .filter((el): el is HTMLElement => el !== null)
     if (sections.length === 0 || typeof IntersectionObserver === 'undefined') return
     const observer = new IntersectionObserver(
       (entries) => {
@@ -37,7 +32,7 @@ export function Navbar() {
     )
     sections.forEach((s) => observer.observe(s))
     return () => observer.disconnect()
-  }, [])
+  }, [c.nav.links])
 
   useEffect(() => {
     if (!open) return
@@ -48,10 +43,15 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [open])
 
+  const lmsLinkProps = {
+    href: c.site.lmsUrl,
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  } as const
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-2.5 sm:px-6 sm:pt-3">
       <div className="mx-auto max-w-6xl">
-        {/* Floating pill — kept deliberately slim */}
         <div
           className={`flex items-center justify-between gap-3 rounded-full border py-1.5 pl-3.5 pr-1.5 backdrop-saturate-150 transition-all duration-300 sm:pl-4 ${
             scrolled || open
@@ -64,9 +64,9 @@ export function Navbar() {
           </a>
 
           <nav className="hidden items-center gap-5 lg:flex" aria-label="Primary">
-            {NAV_LINKS.map((link) => (
+            {c.nav.links.map((link) => (
               <a
-                key={link.href}
+                key={link.href + link.label}
                 href={link.href}
                 aria-current={activeHref === link.href ? 'true' : undefined}
                 className={`relative text-[13px] font-medium transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:rounded-full after:bg-brand-600 after:transition-all ${
@@ -85,7 +85,7 @@ export function Navbar() {
               {...lmsLinkProps}
               className="hidden items-center gap-1 rounded-full bg-brand-600 px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift active:translate-y-0 sm:inline-flex"
             >
-              LMS Login
+              {c.site.lmsLabel}
               <ArrowUpRightIcon className="h-3.5 w-3.5" />
               <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
             </a>
@@ -102,16 +102,15 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Floating glass menu card (mobile) */}
         {open && (
           <div
             id="mobile-menu"
             className="mt-2 rounded-3xl border border-white/50 bg-white/70 p-2 shadow-lift backdrop-blur-2xl backdrop-saturate-150 lg:hidden"
           >
             <nav className="flex flex-col gap-0.5" aria-label="Mobile">
-              {NAV_LINKS.map((link) => (
+              {c.nav.links.map((link) => (
                 <a
-                  key={link.href}
+                  key={link.href + link.label}
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className={`rounded-2xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
@@ -127,7 +126,7 @@ export function Navbar() {
                 {...lmsLinkProps}
                 className="mt-1 inline-flex items-center justify-between rounded-2xl bg-brand-600 px-4 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-brand-700"
               >
-                <span>LMS Login</span>
+                <span>{c.site.lmsLabel}</span>
                 <span className="flex items-center gap-1 text-[13px] font-medium text-brand-100">
                   lms.beict.lk <ArrowUpRightIcon className="h-4 w-4" />
                 </span>
