@@ -34,7 +34,12 @@ export function useReveal<T extends HTMLElement>() {
     )
 
     observer.observe(el)
-    return () => observer.disconnect()
+    // safety net: never leave content invisible if the observer misfires
+    const failsafe = setTimeout(() => el.classList.add('is-visible'), 2500)
+    return () => {
+      observer.disconnect()
+      clearTimeout(failsafe)
+    }
   }, [])
 
   return ref

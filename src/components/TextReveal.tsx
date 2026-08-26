@@ -130,7 +130,12 @@ export function TextReveal({
       { threshold: 0.2 },
     )
     observer.observe(el)
-    return () => observer.disconnect()
+    // failsafe: reveal even if the observer never fires
+    const timer = setTimeout(() => setInView(true), 3000)
+    return () => {
+      observer.disconnect()
+      clearTimeout(timer)
+    }
   }, [armed])
 
   const state = { i: 0 }
@@ -191,7 +196,11 @@ export function BlurIn({ children, as = 'div', className = '', delay = 0 }: Blur
       { threshold: 0.2 },
     )
     observer.observe(el)
-    return () => observer.disconnect()
+    const timer = setTimeout(() => setInView(true), 3000)
+    return () => {
+      observer.disconnect()
+      clearTimeout(timer)
+    }
   }, [armed])
 
   return (
