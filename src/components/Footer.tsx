@@ -1,0 +1,116 @@
+import { NAV_LINKS, SITE } from '../data/content'
+import { FacebookIcon, YoutubeIcon } from './Icons'
+import { Logo } from './Logo'
+import { ArrowUpRightIcon } from './Icons'
+
+export function Footer() {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="bg-navy-950 text-brand-100/80" aria-labelledby="footer-heading">
+      <h2 id="footer-heading" className="sr-only">
+        Footer
+      </h2>
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:gap-16">
+        <div className="flex flex-col items-start gap-4">
+          <Logo variant="dark" />
+          <p className="max-w-xs text-sm leading-relaxed">
+            {SITE.subject} for the {SITE.level} — in Sinhala medium. Classes plus a complete
+            online learning system.
+          </p>
+          <div className="flex gap-3">
+            <a
+              href={SITE.facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="BEICT on Facebook (opens in a new tab)"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand-600"
+            >
+              <FacebookIcon className="h-4.5 w-4.5" />
+            </a>
+            <a
+              href={SITE.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Bhanuka Ekanayaka on YouTube (opens in a new tab)"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand-600"
+            >
+              <YoutubeIcon className="h-4.5 w-4.5" />
+            </a>
+            <a
+              href={SITE.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="BEICT on WhatsApp (opens in a new tab)"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-brand-600"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-4.5 w-4.5">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <nav aria-label="Footer">
+          <h3 className="font-display text-sm font-bold uppercase tracking-wider text-white">Explore</h3>
+          <ul className="mt-4 grid gap-2.5 text-sm">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className="transition-colors hover:text-white">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div>
+          <h3 className="font-display text-sm font-bold uppercase tracking-wider text-white">
+            Learning &amp; Contact
+          </h3>
+          <ul className="mt-4 grid gap-2.5 text-sm">
+            <li>
+              <a
+                href={SITE.lmsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-white transition-colors hover:text-brand-300"
+              >
+                LMS Login — lms.beict.lk <ArrowUpRightIcon className="h-3.5 w-3.5" />
+              </a>
+            </li>
+            <li>
+              <a href={SITE.phoneTel} className="transition-colors hover:text-white">
+                {SITE.phoneDisplay}
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-white">
+                {SITE.email}
+              </a>
+            </li>
+            <li>{SITE.hours}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs sm:flex-row sm:px-6">
+          <p>
+            © {year} {SITE.name} — {SITE.longName}. All rights reserved.
+          </p>
+          <p>
+            Online learning:{' '}
+            <a
+              href={SITE.lmsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-200 underline underline-offset-2 hover:text-white"
+            >
+              lms.beict.lk
+            </a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  )
+}
