@@ -7,38 +7,66 @@
  * blob-only deployments keep working.
  *
  * Tables self-migrate on first use (idempotent CREATE TABLE IF NOT EXISTS).
+ * Every query is time-boxed — a hanging connection (e.g. a connection string
+ * with `channel_binding=require`, which the Neon HTTP driver cannot complete)
+ * degrades gracefully instead of stalling the admin forever.
  */
 
 import { neon } from '@neondatabase/serverless'
 
 // Node runtime global (this module is imported only by Vercel API functions)
-
+declare const process: { env: Record<string, string | undefined> }
 
 type Sql = ReturnType<typeof neon>
 
 let cached: Sql | null | undefined
 let schemaReady = false
 
+/**
+ * The Neon HTTP driver hangs indefinitely on connection strings with
+ * `channel_binding=require` (as copied from the Neon dashboard), so strip it
+ * and any other libpq-only params before connecting.
+ */
+function connectionString(): string | null {
+  const raw = process.env.DATABASE_URL
+  if (!raw) return null
+  try {
+    const u = new URL(raw)
+    u.searchParams.delete('channel_binding')
+    return u.toString()
+  } catch {
+    return raw
+  }
+}
+
 export function getSql(): Sql | null {
   if (cached !== undefined) return cached
-  const url = process.env.DATABASE_URL
-  cached = url ? neon(url) : null
+  const cs = connectionString()
+  cached = cs ? neon(cs) : null
   return cached
+}
+
+/** Never wait more than this for a Neon round-trip — fail soft instead. */
+function withTimeout<T>(p: Promise<T>, ms = 6000): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`db timeout after ${ms}ms`)), ms)),
+  ])
 }
 
 export async function ensureSchema(): Promise<void> {
   const sql = getSql()
   if (!sql || schemaReady) return
-  await sql`CREATE TABLE IF NOT EXISTS cms_content (
+  await withTimeout(sql`CREATE TABLE IF NOT EXISTS cms_content (
     id integer PRIMARY KEY DEFAULT 1,
     data jsonb NOT NULL,
     updated_at timestamptz NOT NULL DEFAULT now()
-  )`
-  await sql`CREATE TABLE IF NOT EXISTS cms_login_throttle (
+  )`)
+  await withTimeout(sql`CREATE TABLE IF NOT EXISTS cms_login_throttle (
     ip text PRIMARY KEY,
     count integer NOT NULL DEFAULT 0,
     window_start timestamptz NOT NULL DEFAULT now()
-  )`
+  )`)
   schemaReady = true
 }
 
@@ -48,7 +76,7 @@ export async function loadContent(): Promise<unknown | null> {
   if (!sql) return null
   try {
     await ensureSchema()
-    const rows = (await sql`SELECT data FROM cms_content WHERE id = 1 LIMIT 1`) as { data: unknown }[]
+    const rows = (await withTimeout(sql`SELECT data FROM cms_content WHERE id = 1 LIMIT 1`)) as { data: unknown }[]
     return rows.length ? rows[0].data : null
   } catch (err) {
     console.error('[cms] loadContent failed:', err)
@@ -61,8 +89,8 @@ export async function saveContent(data: unknown): Promise<void> {
   if (!sql) return
   await ensureSchema()
   const json = JSON.stringify(data)
-  await sql`INSERT INTO cms_content (id, data, updated_at) VALUES (1, ${json}::jsonb, now())
-            ON CONFLICT (id) DO UPDATE SET data = ${json}::jsonb, updated_at = now()`
+  await withTimeout(sql`INSERT INTO cms_content (id, data, updated_at) VALUES (1, ${json}::jsonb, now())
+            ON CONFLICT (id) DO UPDATE SET data = ${json}::jsonb, updated_at = now()`)
 }
 
 /**
@@ -75,22 +103,22 @@ export async function checkLoginThrottle(ip: string): Promise<boolean> {
   if (!sql) return false
   try {
     await ensureSchema()
-    const rows = (await sql`SELECT count, window_start FROM cms_login_throttle WHERE ip = ${ip} LIMIT 1`) as {
+    const rows = (await withTimeout(sql`SELECT count, window_start FROM cms_login_throttle WHERE ip = ${ip} LIMIT 1`)) as {
       count: number
       window_start: string
     }[]
     if (rows.length === 0) {
-      await sql`INSERT INTO cms_login_throttle (ip, count, window_start) VALUES (${ip}, 1, now())`
+      await withTimeout(sql`INSERT INTO cms_login_throttle (ip, count, window_start) VALUES (${ip}, 1, now())`)
       return false
     }
     const row = rows[0]
     const windowExpired = Date.now() - new Date(row.window_start).getTime() > 10 * 60 * 1000
     if (windowExpired) {
-      await sql`UPDATE cms_login_throttle SET count = 1, window_start = now() WHERE ip = ${ip}`
+      await withTimeout(sql`UPDATE cms_login_throttle SET count = 1, window_start = now() WHERE ip = ${ip}`)
       return false
     }
     const count = row.count + 1
-    await sql`UPDATE cms_login_throttle SET count = ${count} WHERE ip = ${ip}`
+    await withTimeout(sql`UPDATE cms_login_throttle SET count = ${count} WHERE ip = ${ip}`)
     return count > 10
   } catch (err) {
     console.error('[cms] login throttle failed (failing open):', err)

@@ -21,9 +21,10 @@ async function readStoredContent(): Promise<unknown> {
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'GET') {
-    const authed = await isAuthed(req)
+    let authed = false
     let content: unknown = null
     try {
+      authed = await isAuthed(req)
       content = await readStoredContent()
     } catch (err) {
       console.error('[cms] content GET read failed:', err)

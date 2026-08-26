@@ -59,15 +59,20 @@ export function clearedCookie(): string {
 
 /** Returns true when the request carries a valid, unexpired session cookie. */
 export async function isAuthed(req: Request): Promise<boolean> {
-  const key = secret()
-  if (!key) return false
-  const cookieHeader = req.headers.get('cookie') ?? ''
-  const match = cookieHeader.match(new RegExp(`${COOKIE_NAME}=(\\d+)\\.([a-f0-9]+)`))
-  if (!match) return false
-  const [, exp, sig] = match
-  if (Number(exp) < Date.now()) return false
-  const expectedSig = await hmac(exp, key)
-  return timingSafeEqualStr(sig, expectedSig)
+  try {
+    const key = secret()
+    if (!key) return false
+    const cookieHeader = req.headers.get('cookie') ?? ''
+    const match = cookieHeader.match(new RegExp(`${COOKIE_NAME}=(\\d+)\\.([a-f0-9]+)`))
+    if (!match) return false
+    const [, exp, sig] = match
+    if (Number(exp) < Date.now()) return false
+    const expectedSig = await hmac(exp, key)
+    return timingSafeEqualStr(sig, expectedSig)
+  } catch (err) {
+    console.error('[cms] session check failed:', err)
+    return false
+  }
 }
 
 /** Best-effort client IP for rate limiting (throttle itself lives in db.ts / memory). */
