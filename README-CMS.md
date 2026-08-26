@@ -11,16 +11,31 @@ editing exists, and the server rejects any payload that tries to alter the struc
 ## One-time Vercel setup
 
 1. **Deploy the project to Vercel** (framework: Vite — auto-detected).
-2. Dashboard → **Storage** → *Create Database* → **Blob** → connect it to this project.
-   This injects `BLOB_READ_WRITE_TOKEN`.
-3. Dashboard → **Settings** → **Environment Variables** → add:
+2. **Neon (database)** — create a project at [neon.tech](https://neon.tech), copy the
+   **pooled connection string**, and add it as env var `DATABASE_URL`.
+   The CMS tables (`cms_content`, `cms_login_throttle`) auto-create on first publish —
+   or run `cms.sql` manually. This is the content database and powers persistent
+   login throttling.
+3. **Vercel Blob (media store)** — Dashboard → **Storage** → *Create Database* →
+   **Blob** → connect it to this project. This injects `BLOB_READ_WRITE_TOKEN`;
+   it stores uploaded images.
+4. Dashboard → **Settings** → **Environment Variables** → add:
    | Name | Value |
    |---|---|
    | `ADMIN_PASSWORD` | your admin password |
    | `CMS_SESSION_SECRET` | any long random string |
-4. **Redeploy** (Deployments → ⋯ → Redeploy) so the new env vars apply.
+   | `DATABASE_URL` | your Neon pooled connection string |
+5. **Redeploy** (Deployments → ⋯ → Redeploy) so the new env vars apply.
 
 That's it — open `https://<your-domain>/admin`, sign in, edit, **Publish**.
+
+### Storage precedence (graceful degradation)
+
+| `DATABASE_URL` set? | `BLOB token` set? | Content stored in | Images |
+|---|---|---|---|
+| ✅ | ✅ | **Neon Postgres** | Vercel Blob |
+| ❌ | ✅ | Vercel Blob (`cms/content.json`) | Vercel Blob |
+| ❌ | ❌ | localStorage (local dev only) | inline data URLs |
 
 ## What's editable
 
@@ -35,13 +50,16 @@ That's it — open `https://<your-domain>/admin`, sign in, edit, **Publish**.
 
 ## How it works
 
-- Content lives as one validated JSON document in Vercel Blob (`cms/content.json`).
+- Content lives as one validated JSON document in **Neon Postgres** (`cms_content`,
+  jsonb) when `DATABASE_URL` is set; otherwise it falls back to Vercel Blob
+  (`cms/content.json`).
 - `GET /api/content` — public; returns `{ authed, content }` (edge-cached ~15 s, so
   published edits appear within seconds).
 - `PUT /api/content` — admin-only; validates the payload against `src/cms/schema.ts`
   (unknown fields dropped, URL schemes whitelisted, counts capped) before writing.
 - `POST /api/login` — compares against `ADMIN_PASSWORD` server-side (timing-safe),
-  sets a signed HttpOnly session cookie (7 days). Basic per-IP rate limiting.
+  sets a signed HttpOnly session cookie (7 days). Login throttling is persistent in
+  Neon (10 attempts / 10 min per IP) when the database is configured.
 - `POST /api/upload` — admin-only image upload to Blob.
 
 ## Local development
@@ -56,4 +74,6 @@ Without Vercel env vars the admin still works: content changes persist to
 - `src/cms/CmsProvider.tsx` — state, path get/set, list/section ops, publish
 - `src/cms/edit.tsx` — `<T>` inline text, `EditableImage`, `EditableIcon`, item controls
 - `src/admin/AdminApp.tsx` — login, toolbar, sections panel, fields panel
+- `src/cms/server/db.ts` — Neon access + auto-migration + login throttle
 - `api/*.ts` — Vercel functions (login/logout/content/upload)
+- `cms.sql` — reference schema for the two Neon tables

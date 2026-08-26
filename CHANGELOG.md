@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## 2.1.0 — 2026-08-26 · Neon Postgres as the CMS database
+
+Matching the previous CMS architecture: **Neon Postgres stores content, Vercel Blob
+stores media**.
+
+### Added
+- `DATABASE_URL` env var (Neon pooled connection string) — when set, CMS content is
+  stored in a `cms_content` jsonb table and login throttling becomes persistent
+  (`cms_login_throttle`, 10 attempts / 10 min per IP, surviving cold starts).
+- `src/cms/server/db.ts` — Neon access layer; both tables self-migrate on first use
+  (idempotent), reference schema in `cms.sql`.
+- Storage precedence: **Neon → Vercel Blob → localStorage (dev)**. Blob-only
+  deployments and local dev keep working unchanged.
+- `@neondatabase/serverless` dependency (server functions only — client bundle
+  unchanged).
+
+### Changed
+- `api/content.ts` reads/writes Neon first, falls back to Blob.
+- `api/login.ts` uses the DB-backed throttle when available (was in-memory only).
+- README-CMS.md setup now includes the Neon step; `.env.example` adds `DATABASE_URL`.
+
 ## 2.0.0 — 2026-08-26 · Aug update — built-in CMS (Wix-style structured builder)
 
 The site now has its own click-to-edit CMS at **`/admin`**, powered by the admin

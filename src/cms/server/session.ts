@@ -68,22 +68,7 @@ export async function isAuthed(req: Request): Promise<boolean> {
   return timingSafeEqualStr(sig, expectedSig)
 }
 
-// ---------- naive per-instance login rate limiting ----------
-
-const attempts = new Map<string, { count: number; reset: number }>()
-
-export function rateLimited(ip: string): boolean {
-  const now = Date.now()
-  const entry = attempts.get(ip)
-  if (!entry || entry.reset < now) {
-    attempts.set(ip, { count: 1, reset: now + 10 * 60 * 1000 })
-    return false
-  }
-  entry.count += 1
-  return entry.count > 10
-}
-
-/** Best-effort client IP for rate limiting. */
+/** Best-effort client IP for rate limiting (throttle itself lives in db.ts / memory). */
 export function clientIp(req: Request): string {
   return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 }

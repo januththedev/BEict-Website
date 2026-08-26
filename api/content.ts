@@ -1,10 +1,15 @@
 import { put } from '@vercel/blob'
 import { isAuthed } from '../src/cms/server/session'
+import { loadContent, saveContent, getSql } from '../src/cms/server/db'
 import { validateContent } from '../src/cms/schema'
 
 const CONTENT_PATH = 'cms/content.json'
 
+/** Storage precedence: Neon (DATABASE_URL) → Vercel Blob → nothing. */
 async function readStoredContent(): Promise<unknown> {
+  if (getSql()) {
+    return loadContent()
+  }
   if (!process.env.BLOB_READ_WRITE_TOKEN) return null
   const { list } = await import('@vercel/blob')
   const { blobs } = await list({ prefix: CONTENT_PATH, limit: 1 })
@@ -37,9 +42,6 @@ export default async function handler(req: Request): Promise<Response> {
     if (!(await isAuthed(req))) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return new Response('Blob storage not configured', { status: 501 })
-    }
 
     let payload: unknown
     try {
@@ -52,11 +54,17 @@ export default async function handler(req: Request): Promise<Response> {
     const valid = validateContent((payload as { content?: unknown })?.content)
     if (!valid) return Response.json({ error: 'Invalid content' }, { status: 400 })
 
-    await put(CONTENT_PATH, JSON.stringify(valid), {
-      access: 'public',
-      allowOverwrite: true,
-      contentType: 'application/json',
-    })
+    if (getSql()) {
+      await saveContent(valid)
+    } else if (process.env.BLOB_READ_WRITE_TOKEN) {
+      await put(CONTENT_PATH, JSON.stringify(valid), {
+        access: 'public',
+        allowOverwrite: true,
+        contentType: 'application/json',
+      })
+    } else {
+      return new Response('No storage configured', { status: 501 })
+    }
 
     return Response.json({ ok: true })
   }

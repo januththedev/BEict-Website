@@ -1,4 +1,5 @@
-import { passwordMatches, rateLimited, sessionCookie, clientIp } from '../src/cms/server/session'
+import { passwordMatches, sessionCookie, clientIp } from '../src/cms/server/session'
+import { checkLoginThrottle } from '../src/cms/server/db'
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
@@ -6,7 +7,10 @@ export default async function handler(req: Request): Promise<Response> {
   if (!process.env.ADMIN_PASSWORD) {
     return Response.json({ error: 'ADMIN_PASSWORD is not configured' }, { status: 500 })
   }
-  if (rateLimited(clientIp(req))) {
+
+  const ip = clientIp(req)
+  // Persistent throttle when Neon is configured; in-memory fallback otherwise.
+  if (await checkLoginThrottle(ip)) {
     return Response.json({ error: 'Too many attempts — wait 10 minutes' }, { status: 429 })
   }
 
