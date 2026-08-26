@@ -25,3 +25,8 @@ dist-ssr
 
 # test-tool artifacts
 .playwright-mcp/
+
+# secrets - never commit
+.env
+.env.*
+!.env.example
