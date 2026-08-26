@@ -1,17 +1,24 @@
 /**
  * Session helpers for the CMS API (Vercel Node functions).
- * Zero dependencies: HMAC-SHA256 via the platform Web Crypto.
+ * Zero dependencies: HMAC-SHA256 via the runtime's WebCrypto.
  *
  * The admin password lives only in the ADMIN_PASSWORD environment variable —
  * it is compared server-side and never leaves the server. The browser receives
  * an HttpOnly signed cookie it cannot read or forge.
  */
 
-// Node runtime globals (this module is imported only by Vercel API functions)
+// Node runtime global (this module is imported only by Vercel API functions)
 declare const process: { env: Record<string, string | undefined> }
 
 export const COOKIE_NAME = 'cms_session'
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+
+/** Resolves WebCrypto lazily; Vercel's Node 20/22 runtimes expose it globally. */
+function getSubtle(): SubtleCrypto {
+  const c = (globalThis as { crypto?: { subtle?: SubtleCrypto } }).crypto
+  if (!c?.subtle) throw new Error('crypto.subtle is not available in this runtime')
+  return c.subtle
+}
 
 function secret(): string {
   return process.env.CMS_SESSION_SECRET || process.env.ADMIN_PASSWORD || ''
@@ -22,9 +29,10 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 async function hmac(payload: string, key: string): Promise<string> {
+  const subtle = getSubtle()
   const enc = new TextEncoder()
-  const keyObj = await crypto.subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
-  return toHex(await crypto.subtle.sign('HMAC', keyObj, enc.encode(payload)))
+  const keyObj = await subtle.importKey('raw', enc.encode(key), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  return toHex(await subtle.sign('HMAC', keyObj, enc.encode(payload)))
 }
 
 function timingSafeEqualStr(a: string, b: string): boolean {
@@ -38,9 +46,10 @@ function timingSafeEqualStr(a: string, b: string): boolean {
 export async function passwordMatches(input: string): Promise<boolean> {
   const expected = process.env.ADMIN_PASSWORD
   if (!expected || typeof input !== 'string' || input.length === 0) return false
+  const subtle = getSubtle()
   const enc = new TextEncoder()
-  const inHash = toHex(await crypto.subtle.digest('SHA-256', enc.encode(input)))
-  const exHash = toHex(await crypto.subtle.digest('SHA-256', enc.encode(expected)))
+  const inHash = toHex(await subtle.digest('SHA-256', enc.encode(input)))
+  const exHash = toHex(await subtle.digest('SHA-256', enc.encode(expected)))
   return timingSafeEqualStr(inHash, exHash)
 }
 

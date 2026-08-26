@@ -54,19 +54,33 @@ export default async function handler(req: Request): Promise<Response> {
     const valid = validateContent((payload as { content?: unknown })?.content)
     if (!valid) return Response.json({ error: 'Invalid content' }, { status: 400 })
 
-    if (getSql()) {
-      await saveContent(valid)
-    } else if (process.env.BLOB_READ_WRITE_TOKEN) {
+    // Prefer Neon; on any Neon failure fall back to Blob; 500 JSON if both fail.
+    let savedVia = null
+    try {
+      if (getSql()) {
+        await saveContent(valid)
+        savedVia = 'neon'
+      }
+    } catch (err) {
+      console.error('[cms] Neon save failed, falling back to Blob:', err)
+    }
+    if (!savedVia) {
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        return Response.json({ error: 'No storage configured (DATABASE_URL / Blob token)' }, { status: 500 })
+      }
       await put(CONTENT_PATH, JSON.stringify(valid), {
         access: 'public',
         allowOverwrite: true,
         contentType: 'application/json',
       })
-    } else {
-      return new Response('No storage configured', { status: 501 })
+      savedVia = 'blob'
     }
 
-    return Response.json({ ok: true })
+    return Response.json({ ok: true, savedVia })
+  } catch (err) {
+    console.error('[cms] content PUT crashed:', err)
+    return Response.json({ error: 'Save crashed — check the function logs in Vercel' }, { status: 500 })
+  }
   }
 
   return new Response('Method not allowed', { status: 405 })

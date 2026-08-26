@@ -42,13 +42,18 @@ export async function ensureSchema(): Promise<void> {
   schemaReady = true
 }
 
-/** Saved CMS content (validated JSON), or null when absent. */
+/** Saved CMS content (validated JSON), or null when absent/unreachable. */
 export async function loadContent(): Promise<unknown | null> {
   const sql = getSql()
   if (!sql) return null
-  await ensureSchema()
-  const rows = (await sql`SELECT data FROM cms_content WHERE id = 1 LIMIT 1`) as { data: unknown }[]
-  return rows.length ? rows[0].data : null
+  try {
+    await ensureSchema()
+    const rows = (await sql`SELECT data FROM cms_content WHERE id = 1 LIMIT 1`) as { data: unknown }[]
+    return rows.length ? rows[0].data : null
+  } catch (err) {
+    console.error('[cms] loadContent failed:', err)
+    return null
+  }
 }
 
 export async function saveContent(data: unknown): Promise<void> {
@@ -62,27 +67,33 @@ export async function saveContent(data: unknown): Promise<void> {
 
 /**
  * Persistent login throttle: max 10 attempts per IP per 10-minute window.
- * Returns true when the IP is over the limit.
+ * Returns true when the IP is over the limit. Fails open (false) if the DB
+ * is unreachable — a broken database must not lock admins out entirely.
  */
 export async function checkLoginThrottle(ip: string): Promise<boolean> {
   const sql = getSql()
   if (!sql) return false
-  await ensureSchema()
-  const rows = (await sql`SELECT count, window_start FROM cms_login_throttle WHERE ip = ${ip} LIMIT 1`) as {
-    count: number
-    window_start: string
-  }[]
-  if (rows.length === 0) {
-    await sql`INSERT INTO cms_login_throttle (ip, count, window_start) VALUES (${ip}, 1, now())`
+  try {
+    await ensureSchema()
+    const rows = (await sql`SELECT count, window_start FROM cms_login_throttle WHERE ip = ${ip} LIMIT 1`) as {
+      count: number
+      window_start: string
+    }[]
+    if (rows.length === 0) {
+      await sql`INSERT INTO cms_login_throttle (ip, count, window_start) VALUES (${ip}, 1, now())`
+      return false
+    }
+    const row = rows[0]
+    const windowExpired = Date.now() - new Date(row.window_start).getTime() > 10 * 60 * 1000
+    if (windowExpired) {
+      await sql`UPDATE cms_login_throttle SET count = 1, window_start = now() WHERE ip = ${ip}`
+      return false
+    }
+    const count = row.count + 1
+    await sql`UPDATE cms_login_throttle SET count = ${count} WHERE ip = ${ip}`
+    return count > 10
+  } catch (err) {
+    console.error('[cms] login throttle failed (failing open):', err)
     return false
   }
-  const row = rows[0] as { count: number; window_start: string }
-  const windowExpired = Date.now() - new Date(row.window_start).getTime() > 10 * 60 * 1000
-  if (windowExpired) {
-    await sql`UPDATE cms_login_throttle SET count = 1, window_start = now() WHERE ip = ${ip}`
-    return false
-  }
-  const count = row.count + 1
-  await sql`UPDATE cms_login_throttle SET count = ${count} WHERE ip = ${ip}`
-  return count > 10
 }
