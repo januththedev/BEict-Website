@@ -110,6 +110,19 @@ export function Footer() {
             </a>
           </p>
         </div>
+        <div className="mx-auto max-w-6xl px-4 pb-5 text-center text-xs sm:px-6">
+          <p className="text-brand-100/60">
+            Developed by{' '}
+            <a
+              href={SITE.developerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-200 underline underline-offset-2 transition-colors hover:text-white"
+            >
+              {SITE.developerName}
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   )

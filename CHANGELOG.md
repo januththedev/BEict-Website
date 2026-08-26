@@ -23,6 +23,9 @@ Initial fresh build of the BEICT public website.
 - Validated contact form that opens the visitor's email app addressed to hello@beict.lk.
 - Documentation: README (setup, structure, content policy), CONTENT-AUDIT.md (fact → source).
 
+### Added (same day)
+- Footer credit: "Developed by Januth Nimnal" linking to https://januth.dev.
+
 ### QA (2026-08-26)
 - `tsc -b && vite build` clean; JS bundle ≈ 68 KB gzipped.
 - Browser (Chromium via Playwright) against the production build:

@@ -21,6 +21,7 @@ content changes.
 | Facebook | https://www.facebook.com/bhanukaekanyaka/ | beict.lk homepage capture (social links) |
 | YouTube | https://www.youtube.com/channel/UC2vJHPJnfJNwr8DpdRMNE6g | beict.lk homepage capture (social links) |
 | Batch framing on site | "A/L Theory Batches", "Repeat & Revision", "Lessons & Resources" cards, captioned as reflecting categories published on lms.beict.lk | Derived from the Moodle category list above; the site explicitly says current availability is confirmed inside the LMS |
+| Footer credit | "Developed by Januth Nimnal" → https://januth.dev | Provided directly by the site owner (instruction, 2026-08-26) |
 
 ## Deliberately NOT published (could not be verified)
 

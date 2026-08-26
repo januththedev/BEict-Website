@@ -28,6 +28,9 @@ export const SITE = {
   hours: 'Mon – Sun · 8.00 AM – 8.00 PM',
   facebookUrl: 'https://www.facebook.com/bhanukaekanyaka/',
   youtubeUrl: 'https://www.youtube.com/channel/UC2vJHPJnfJNwr8DpdRMNE6g',
+  /** Site developer credit — provided directly by the site owner (2026-08-26). */
+  developerName: 'Januth Nimnal',
+  developerUrl: 'https://januth.dev',
 } as const
 
 export interface NavLink {
