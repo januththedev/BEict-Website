@@ -3,7 +3,6 @@ import { ScrollProgress } from './components/ScrollProgress'
 import { Hero } from './components/Hero'
 import { About } from './components/About'
 import { Batches } from './components/Batches'
-import { CoreSection } from './components/CoreSection'
 import { LmsSection } from './components/LmsSection'
 import { PromoBanners } from './components/PromoBanners'
 import { Community } from './components/Community'
@@ -25,7 +24,6 @@ export default function App() {
         <Hero />
         <About />
         <Batches />
-        <CoreSection />
         <LmsSection />
         <PromoBanners />
         <Community />

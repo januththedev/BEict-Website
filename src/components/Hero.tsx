@@ -3,8 +3,8 @@ import { ArrowUpRightIcon } from './Icons'
 import { HeroCanvas } from './HeroCanvas'
 import { Reveal, btnGhost, btnPrimary } from './ui'
 
-/** Faint blueprint-grid + circuit decoration behind the hero. Pure SVG/CSS,
- * no image payload; hidden from assistive tech and removed for small screens. */
+/** Faint blueprint-grid decoration behind the hero. Pure SVG/CSS, no image
+ * payload; it doubles as the non-WebGL fallback under the canvas. */
 function HeroBackdrop() {
   return (
     <svg
@@ -49,53 +49,50 @@ export function Hero() {
     <section id="home" className="relative overflow-hidden pt-16" aria-labelledby="hero-title">
       <HeroBackdrop />
       <HeroCanvas />
-      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-24 lg:pt-28">
+      <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
+        {/* Glass panel: keeps the headline readable over the WebGL field */}
         <Reveal>
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 shadow-card">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
-            {SITE.level} · {SITE.medium}
-          </span>
-        </Reveal>
-
-        <Reveal delay={80}>
-          <p className="font-display text-lg font-semibold text-brand-600">{SITE.subject}</p>
-          <h1
-            id="hero-title"
-            className="max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-ink sm:text-6xl"
-          >
-            Learn ICT with{' '}
-            <span className="bg-gradient-to-r from-brand-600 to-sky-500 bg-clip-text text-transparent">
-              Bhanuka Ekanayaka
+          <div className="rounded-[2rem] border border-white/70 bg-white/60 p-6 shadow-lift backdrop-blur-2xl sm:p-10 lg:p-12">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
+              {SITE.level} · {SITE.medium}
             </span>
-          </h1>
-        </Reveal>
 
-        <Reveal delay={160}>
-          <p className="max-w-xl text-lg leading-relaxed text-slate-body">
-            BEICT prepares G.C.E. Advanced Level students in Sinhala medium — with classes and a
-            complete online learning system at{' '}
-            <span className="font-semibold text-ink">lms.beict.lk</span>.
-          </p>
-        </Reveal>
+            <p className="mt-5 font-accent text-2xl text-slate-body sm:text-3xl">
+              Information &amp; Communication Technology
+            </p>
+            <h1
+              id="hero-title"
+              className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
+            >
+              Learn it once.{' '}
+              <span className="font-accent font-normal text-brand-600">
+                Learn it with Bhanuka Ekanayaka.
+              </span>
+            </h1>
 
-        <Reveal delay={240} className="flex flex-wrap items-center gap-3">
-          <a
-            href={SITE.lmsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={btnPrimary}
-          >
-            Get Started Learning Now
-            <ArrowUpRightIcon className="h-4 w-4" />
-            <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
-          </a>
-          <a href="#contact" className={btnGhost}>
-            Contact Us
-          </a>
-        </Reveal>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body">
+              A/L ICT in <span className="text-highlight font-medium text-ink">Sinhala medium</span> —
+              in class, on YouTube, and in your pocket on{' '}
+              <span className="text-highlight font-medium text-ink">lms.beict.lk</span>. You bring
+              the effort; the structure is already here.
+            </p>
 
-        <Reveal delay={320}>
-          <p className="font-sinhala text-base text-slate-body">{SITE.sinhalaLmsInvite}</p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
+                Get Started Learning Now
+                <ArrowUpRightIcon className="h-4 w-4" />
+                <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
+              </a>
+              <a href="#contact" className={btnGhost}>
+                Contact Us
+              </a>
+            </div>
+
+            <p className="mt-6 border-t border-white/70 pt-4 font-sinhala text-base text-slate-body">
+              {SITE.sinhalaLmsInvite}
+            </p>
+          </div>
         </Reveal>
       </div>
     </section>

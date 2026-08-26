@@ -2,6 +2,31 @@
 
 All notable changes to this project are documented here.
 
+## 1.2.0-beta — 2026-08-26 (LOCAL ONLY — not pushed)
+
+Design-soul pass on top of 1.1.0-beta, per owner feedback. Revert point for the whole
+beta remains `2c59529`.
+
+### Changed
+- **Removed the "BEICT Core" 3D section** entirely (component, scene, topic data) —
+  owner decision. The hero WebGL field and Community section stay.
+- **Navbar is now a floating glass pill** — detached from the viewport edge, blurred
+  backdrop, denser on scroll; the mobile menu is a floating rounded glass card.
+- **Hero copy sits in a glassmorphism panel** so the WebGL particle field never hurts
+  text clarity.
+- **Typography soul**: Instrument Serif italic joins the system as an accent voice
+  (self-hosted) — used for the hero eyebrow line, the teacher's name, and select title
+  words; a highlighter-pen `.text-highlight` marks key phrases; section eyebrows gained
+  editorial numbers (01–05) and About/Batches headings are left-aligned for rhythm.
+- **Copy rewritten in a human voice** throughout (hero, About, Batches, LMS band,
+  Community, Contact, footer) — same verified facts, warmer wording, no invented claims.
+
+### QA (2026-08-26, production build, Chromium)
+- 0 console errors / warnings; no horizontal overflow at 390 px.
+- Core section confirmed removed from the DOM; pill navbar, glass hero panel, serif
+  accents and highlight marks all verified rendering; glass mobile menu opens.
+- Screenshots: `qa/qa-beta2-hero-glass.png`, `qa/qa-beta2-about.png`.
+
 ## 1.1.0-beta — 2026-08-26 (LOCAL ONLY — not pushed)
 
 Interactive/WebGL upgrade. **Beta per owner instruction: committed locally, not pushed to

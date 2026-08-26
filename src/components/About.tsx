@@ -21,25 +21,27 @@ export function About() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           id="about-title"
+          index="01"
           eyebrow="About BEICT"
-          title="ICT tuition, built around the A/L syllabus"
-          lede="BEICT — Bhanuka Ekanayaka ICT — prepares G.C.E. Advanced Level students for Information & Communication Technology, taught in Sinhala medium, alongside a dedicated online learning system."
+          align="left"
+          title="One subject. Taught properly."
+          lede="BEICT does one thing — G.C.E. A/L ICT in Sinhala medium — in class and online, for students who want it explained clearly."
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           <Reveal className="flex flex-col justify-center gap-4 rounded-2xl border border-slate-100 bg-ice p-8">
             <h3 className="font-display text-xl font-bold text-ink">
-              One teacher, one subject, done properly
+              Why only <span className="font-accent font-normal text-brand-600">one</span> subject?
             </h3>
             <p className="leading-relaxed">
-              Every class and every online course focuses on a single goal: the G.C.E. Advanced
-              Level Information &amp; Communication Technology examination. Lessons follow the
-              national syllabus in Sinhala medium, so what you learn in class is exactly what you
-              write in the exam hall.
+              Because depth beats breadth. Every class, every video and every course on the
+              learning system is built around a single exam — the G.C.E. Advanced Level ICT paper
+              — so nothing that comes out of BEICT is filler.
             </p>
             <p className="leading-relaxed">
-              Between physical classes, the BEICT learning system keeps lessons, resources and
-              updates available online — so revision never has to wait for the next session.
+              Lessons follow the national syllabus in Sinhala medium, so what you hear in class
+              is exactly what you write in the exam hall. Between sessions, the learning system
+              keeps everything available — revision doesn't wait for next week's class.
             </p>
           </Reveal>
 

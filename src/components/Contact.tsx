@@ -61,9 +61,10 @@ export function Contact() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           id="contact-title"
+          index="05"
           eyebrow="Contact"
-          title="Get in touch"
-          lede={`Questions about classes or the online learning system? Reach out any day between 8.00 AM and 8.00 PM.`}
+          title="Talk to us"
+          lede="Batches, the LMS, or anything else — WhatsApp is usually fastest. Otherwise, the form below opens a ready-written email."
         />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">

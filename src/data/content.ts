@@ -85,62 +85,6 @@ export const LESSON_VIDEOS: LessonVideo[] = [
   },
 ]
 
-/** Topics orbiting the interactive 3D "BEICT Core". Names come from the
- * verified public lesson titles above (or the LMS); links point at the
- * matching lesson, the channel, or the LMS. */
-export interface CoreTopic {
-  id: string
-  label: string
-  hint: string
-  href?: string
-  external?: boolean
-}
-
-export const CORE_TOPICS: CoreTopic[] = [
-  {
-    id: 'logic-gates',
-    label: 'Logic Gates',
-    hint: 'Full two-part lesson on the channel',
-    href: 'https://www.youtube.com/watch?v=ucSt6qmxejY',
-    external: true,
-  },
-  {
-    id: 'os',
-    label: 'Operating Systems',
-    hint: '2025 Theory lesson on the channel',
-    href: 'https://www.youtube.com/watch?v=FL_xJNMIbwM',
-    external: true,
-  },
-  {
-    id: 'theory',
-    label: 'A/L Theory',
-    hint: 'Sinhala-medium theory classes',
-    href: 'https://www.youtube.com/@BhanukaEkanayaka',
-    external: true,
-  },
-  {
-    id: 'revision',
-    label: 'Revision',
-    hint: 'Repeat & revision track on the LMS',
-    href: SITE.lmsUrl,
-    external: true,
-  },
-  {
-    id: 'student-voices',
-    label: 'Student Voices',
-    hint: 'සිසු අදහස් series on the channel',
-    href: 'https://www.youtube.com/watch?v=qXdZE8FHEt0',
-    external: true,
-  },
-  {
-    id: 'lms',
-    label: 'BICT Online',
-    hint: 'Lessons & resources at lms.beict.lk',
-    href: SITE.lmsUrl,
-    external: true,
-  },
-]
-
 export interface NavLink {
   label: string
   href: string

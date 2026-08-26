@@ -40,11 +40,16 @@ export function LmsSection() {
           <div className="flex flex-col gap-6">
             <SectionHeading
               id="lms-title"
+              index="03"
+              eyebrow="BICT Online"
               align="left"
               dark
-              eyebrow="BICT Online"
-              title="The BEICT Online Learning System"
-              lede="The classroom doesn't close when the lesson ends. lms.beict.lk is where BEICT students find their courses, materials and updates — from anywhere."
+              title={
+                <>
+                  The class follows{' '}
+                  <span className="font-accent font-normal text-sky-300">you</span> home
+                </>
+              }              lede="Lessons, resources and the class calendar live at lms.beict.lk. Sign in and pick up where the whiteboard left off."
             />
             <Reveal delay={140}>
               <p className="font-sinhala text-lg leading-relaxed text-brand-100">

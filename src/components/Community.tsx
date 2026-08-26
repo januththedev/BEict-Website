@@ -112,9 +112,15 @@ export function Community() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           id="community-title"
+          index="04"
           eyebrow="Community"
-          title="The classroom never stops"
-          lede="Full lessons, seminar recaps and student stories — published publicly for every A/L ICT student. Numbers below are live from the platforms."
+          title={
+            <>
+              Where the class lives{' '}
+              <span className="font-accent font-normal text-brand-600">online</span>
+            </>
+          }
+          lede="Full lessons go up on YouTube, free — theory, revision, seminars and student stories. The numbers below are live from the platforms."
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
