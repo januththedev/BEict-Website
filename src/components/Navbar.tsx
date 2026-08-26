@@ -53,10 +53,10 @@ export function Navbar() {
       <div className="mx-auto max-w-6xl">
         {/* Floating pill — kept deliberately slim */}
         <div
-          className={`flex items-center justify-between gap-3 rounded-full border py-1.5 pl-3.5 pr-1.5 transition-all duration-300 sm:pl-4 ${
+          className={`flex items-center justify-between gap-3 rounded-full border py-1.5 pl-3.5 pr-1.5 backdrop-saturate-150 transition-all duration-300 sm:pl-4 ${
             scrolled || open
-              ? 'border-white/70 bg-white/85 shadow-lift backdrop-blur-2xl'
-              : 'border-white/50 bg-white/60 backdrop-blur-xl'
+              ? 'border-white/60 bg-white/70 shadow-lift backdrop-blur-2xl'
+              : 'border-white/40 bg-white/30 backdrop-blur-xl'
           }`}
         >
           <a href="#home" className="shrink-0 rounded-md" aria-label="BEICT — back to top">
@@ -106,7 +106,7 @@ export function Navbar() {
         {open && (
           <div
             id="mobile-menu"
-            className="mt-2 rounded-3xl border border-white/70 bg-white/90 p-2 shadow-lift backdrop-blur-2xl lg:hidden"
+            className="mt-2 rounded-3xl border border-white/50 bg-white/70 p-2 shadow-lift backdrop-blur-2xl backdrop-saturate-150 lg:hidden"
           >
             <nav className="flex flex-col gap-0.5" aria-label="Mobile">
               {NAV_LINKS.map((link) => (

@@ -51,66 +51,77 @@ export function Hero() {
       <HeroBackdrop />
       <HeroCanvas />
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-24 sm:pt-32">
-        {/* Glass panel: keeps the headline readable over the WebGL field */}
+        {/* Liquid-glass panel: the WebGL field stays visible through it */}
         <Reveal>
-          <div className="rounded-[2rem] border border-white/70 bg-white/60 p-6 shadow-lift backdrop-blur-2xl sm:p-10 lg:p-12">
-            <BlurIn
-              as="span"
-              delay={150}
-              className="inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
-              {SITE.level} · {SITE.medium}
-            </BlurIn>
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/50 bg-white/25 shadow-lift backdrop-blur-2xl backdrop-saturate-150">
+            {/* glass sheen + soft highlight blobs */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/45 via-transparent to-sky-100/25"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/30 blur-3xl"
+            />
+            <div className="relative p-6 sm:p-10 lg:p-12">
+              <BlurIn
+                as="span"
+                delay={150}
+                className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 backdrop-blur-xl"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
+                {SITE.level} · {SITE.medium}
+              </BlurIn>
 
-            <TextReveal
-              as="p"
-              variant="letters"
-              delay={350}
-              step={22}
-              className="mt-5 font-display text-lg font-semibold text-brand-600"
-            >
-              {SITE.subject}
-            </TextReveal>
-            <TextReveal
-              as="h1"
-              id="hero-title"
-              delay={480}
-              step={55}
-              className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
-            >
-              Learn ICT with{' '}
-              <span className="text-gradient-brand">Bhanuka Ekanayaka</span>
-            </TextReveal>
+              <TextReveal
+                as="p"
+                variant="letters"
+                delay={350}
+                step={22}
+                className="mt-5 font-display text-lg font-semibold text-brand-600"
+              >
+                {SITE.subject}
+              </TextReveal>
+              <TextReveal
+                as="h1"
+                id="hero-title"
+                delay={480}
+                step={55}
+                className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
+              >
+                Learn ICT with{' '}
+                <span className="text-gradient-brand">Bhanuka Ekanayaka</span>
+              </TextReveal>
 
-            <BlurIn
-              as="p"
-              delay={950}
-              className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body"
-            >
-              BEICT prepares G.C.E. Advanced Level students in Sinhala medium — with classes and
-              a complete online learning system at{' '}
-              <span className="font-semibold text-ink">lms.beict.lk</span>.
-            </BlurIn>
+              <BlurIn
+                as="p"
+                delay={950}
+                className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body"
+              >
+                BEICT prepares G.C.E. Advanced Level students in Sinhala medium — with classes and
+                a complete online learning system at{' '}
+                <span className="font-semibold text-ink">lms.beict.lk</span>.
+              </BlurIn>
 
-            <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">
-              <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
-                Get Started Learning Now
-                <ArrowUpRightIcon className="h-4 w-4" />
-                <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
-              </a>
-              <a href="#contact" className={btnGhost}>
-                Contact Us
-              </a>
-            </BlurIn>
+              <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">
+                <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
+                  Get Started Learning Now
+                  <ArrowUpRightIcon className="h-4 w-4" />
+                  <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
+                </a>
+                <a href="#contact" className={btnGhost}>
+                  Contact Us
+                </a>
+              </BlurIn>
 
-            <BlurIn
-              as="p"
-              delay={1300}
-              className="mt-6 border-t border-white/70 pt-4 font-sinhala text-base text-slate-body"
-            >
-              {SITE.sinhalaLmsInvite}
-            </BlurIn>
+              <BlurIn
+                as="p"
+                delay={1300}
+                className="mt-6 border-t border-white/50 pt-4 font-sinhala text-base text-slate-body"
+              >
+                {SITE.sinhalaLmsInvite}
+              </BlurIn>
+            </div>
           </div>
         </Reveal>
       </div>
