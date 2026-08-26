@@ -1,5 +1,5 @@
-import { passwordMatches, sessionCookie, clientIp } from '../src/cms/server/session'
-import { checkLoginThrottle } from '../src/cms/server/db'
+import { passwordMatches, sessionCookie, clientIp } from '../src/cms/server/session.js'
+import { checkLoginThrottle } from '../src/cms/server/db.js'
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })

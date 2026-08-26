@@ -13,7 +13,7 @@ import {
   BATCHES,
   PROMOS,
   LESSON_VIDEOS,
-} from '../data/content'
+} from '../data/content.js'
 
 // ---------- types ----------
 

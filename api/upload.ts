@@ -1,5 +1,5 @@
 import { put } from '@vercel/blob'
-import { isAuthed } from '../src/cms/server/session'
+import { isAuthed } from '../src/cms/server/session.js'
 
 const MAX_BYTES = 5 * 1024 * 1024
 const ALLOWED = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml'])

@@ -31,3 +31,5 @@ dist-ssr
 .env.*
 !.env.example
 cms.local.json
+.tmp/
+cms-uploads/

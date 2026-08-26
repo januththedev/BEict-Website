@@ -12,7 +12,7 @@
 import { neon } from '@neondatabase/serverless'
 
 // Node runtime global (this module is imported only by Vercel API functions)
-declare const process: { env: Record<string, string | undefined> }
+
 
 type Sql = ReturnType<typeof neon>
 
