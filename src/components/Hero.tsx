@@ -78,10 +78,8 @@ export function Hero() {
               step={55}
               className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
             >
-              Learn it once.{' '}
-              <span className="font-accent font-normal text-brand-600">
-                Learn it with Bhanuka Ekanayaka.
-              </span>
+              Learn ICT with{' '}
+              <span className="font-accent font-normal text-brand-600">Bhanuka Ekanayaka</span>
             </TextReveal>
 
             <BlurIn
@@ -89,10 +87,10 @@ export function Hero() {
               delay={950}
               className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body"
             >
-              A/L ICT in <span className="text-highlight font-medium text-ink">Sinhala medium</span> —
-              in class, on YouTube, and in your pocket on{' '}
-              <span className="text-highlight font-medium text-ink">lms.beict.lk</span>. You bring
-              the effort; the structure is already here.
+              BEICT prepares G.C.E. Advanced Level students in{' '}
+              <span className="text-highlight font-medium text-ink">Sinhala medium</span> — with
+              classes and a complete online learning system at{' '}
+              <span className="text-highlight font-medium text-ink">lms.beict.lk</span>.
             </BlurIn>
 
             <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">
