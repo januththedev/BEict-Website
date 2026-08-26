@@ -54,7 +54,7 @@ export const CHAPTERS = [
   { id: 'vault', start: 0.48, end: 0.64 },
   { id: 'map', start: 0.64, end: 0.76 },
   { id: 'community', start: 0.76, end: 0.84 },
-  { id: 'gallery', start: 0.84, end: 0.94 },
+  { id: 'gallery', start: 0.84, end: 0.97 },
 ]
 export const TRACK_VH = 1500 // height of the 3D scroll track, in vh
 

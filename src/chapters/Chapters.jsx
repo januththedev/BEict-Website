@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { CHAPTERS, SITE, TRACK_VH, VENUES, mapsUrlFor } from '../data/content.js'
+import { CHAPTERS, GALLERY_CAPTIONS, SITE, TRACK_VH, VENUES, mapsUrlFor } from '../data/content.js'
 import { Button } from '../components/ui.jsx'
 
 /**
@@ -49,7 +49,7 @@ function Beat({ progress, chapter, index, count, className = '', children, as: T
   )
 }
 
-function ChapterFrame({ chapter, children, align = 'left' }) {
+function ChapterFrame({ chapter, children, align = 'left', valign = 'center' }) {
   const alignCls =
     align === 'center' ? 'justify-center text-center' : align === 'right' ? 'justify-end' : 'justify-start'
   return (
@@ -58,7 +58,7 @@ function ChapterFrame({ chapter, children, align = 'left' }) {
       className="absolute inset-x-0"
       style={{ top: `${chapter.start * TRACK_VH}vh`, height: `${(chapter.end - chapter.start) * TRACK_VH}vh` }}
     >
-      <div className={`sticky top-0 flex h-screen items-center px-6 sm:px-14 lg:px-24 ${alignCls}`}>{children}</div>
+      <div className={`sticky top-0 flex h-screen px-6 sm:px-14 lg:px-24 ${valign === 'top' ? 'items-start pt-28' : 'items-center'} ${alignCls}`}>{children}</div>
     </div>
   )
 }
@@ -121,27 +121,29 @@ function IdentityChapter({ progress }) {
   const ch = CHAPTERS[1]
   return (
     <ChapterFrame chapter={ch} align="left">
-      <div className="max-w-xl">
+      <div className="max-w-md">
         <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
           <Eyebrow>Who is Bhanuka Sir</Eyebrow>
         </Beat>
         <Beat progress={progress} chapter={ch} index={1} count={3} as="h2" className={`${H2} text-[clamp(2rem,4.5vw,3.8rem)]`}>
-          The teacher behind
-          <span className="bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent"> the machine.</span>
+          Theory. Revision.
+          <span className="block bg-gradient-to-r from-cyan-300 to-blue-500 bg-clip-text text-transparent">
+            Papers.
+          </span>
         </Beat>
         <Beat progress={progress} chapter={ch} index={2} count={3} as="div" className={`mt-6 ${LEAD}`}>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4">
             <img
               src="/images/bhanuka-sir.png"
               alt={`Portrait of ${SITE.owner}`}
-              width="84"
-              height="84"
+              width="72"
+              height="72"
               loading="lazy"
-              className="size-20 rounded-2xl object-contain object-bottom ring-1 ring-slate-200"
+              className="size-16 rounded-xl object-contain object-bottom ring-1 ring-slate-200"
             />
             <p>
-              <span className="font-semibold text-ink">{SITE.owner}</span> — {SITE.tagline}.
-              Teaching {SITE.subject} for {SITE.level}, from Horana to the whole island.
+              <span className="font-semibold text-ink">{SITE.owner}</span> conducts
+              classes in six halls across the island and online on the BEICT LMS.
             </p>
           </div>
         </Beat>
@@ -198,7 +200,7 @@ function CoreChapter({ progress }) {
 
   return (
     <ChapterFrame chapter={ch} align="left">
-      <div className="max-w-xl">
+      <div className="max-w-md">
         <Beat progress={progress} chapter={ch} index={0} count={3} as="div" className="mb-5">
           <Eyebrow>Inside the teacher’s mind</Eyebrow>
         </Beat>
@@ -320,14 +322,57 @@ function CommunityChapter({ progress }) {
 
 function GalleryChapter({ progress }) {
   const ch = CHAPTERS[7]
+  const stripRef = useRef(null)
+  const reduce = Boolean(useReducedMotion())
+
+  // The photo strip slides right-to-left across the chapter's scroll.
+  useEffect(() => {
+    const el = stripRef.current
+    if (!el || reduce) return
+    const { start, end } = ch
+    const span = end - start
+    const apply = (p) => {
+      const local = clamp01((p - start) / span)
+      // travel from +18% to -62% of the viewport width
+      const x = 18 - local * 80
+      el.style.transform = `translateX(${x}vw)`
+    }
+    apply(progress.get())
+    return progress.on('change', apply)
+  }, [progress, ch, reduce])
+
   return (
-    <ChapterFrame chapter={ch} align="center">
-      <div className="max-w-lg">
+    <ChapterFrame chapter={ch} align="center" valign="top">
+      <div className="w-full">
         <Beat progress={progress} chapter={ch} index={0} count={1} as="div" className="flex flex-col items-center gap-4">
           <Eyebrow>Gallery</Eyebrow>
-          <h2 className={`${H2} text-[clamp(1.8rem,4vw,3.2rem)]`}>Inside the classroom</h2>
-          <p className={LEAD}>Moments from BEICT classes — fly through them.</p>
+          <h2 className={`${H2} text-[clamp(1.8rem,4vw,3.2rem)] text-ink`}>Inside the classroom</h2>
+          <p className="text-base text-slate-500">Moments from BEICT classes — fly through them.</p>
         </Beat>
+      </div>
+      <div
+        ref={stripRef}
+        className="pointer-events-none absolute inset-x-0 top-[38%] flex gap-6 will-change-transform"
+        aria-hidden
+      >
+        {GALLERY_CAPTIONS.map((cap, i) => (
+          <figure
+            key={cap + i}
+            className="shrink-0 overflow-hidden rounded-2xl border border-white/70 bg-white shadow-[0_24px_60px_-20px_rgba(12,27,58,0.35)]"
+            style={{
+              aspectRatio: '2 / 3',
+              width: 'clamp(150px, 17vw, 240px)',
+              transform: `rotate(${(i % 2 ? 1 : -1) * (1.5 + (i % 3))}deg)`,
+            }}
+          >
+            <img
+              src={`/images/gallery/${i + 1}.jpg`}
+              alt=""
+              loading="lazy"
+              className="size-full object-cover"
+            />
+          </figure>
+        ))}
       </div>
     </ChapterFrame>
   )

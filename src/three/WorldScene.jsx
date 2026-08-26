@@ -7,7 +7,6 @@ import ChipHero from './setpieces/ChipHero.jsx'
 import NeuralCore from './setpieces/NeuralCore.jsx'
 import Vault from './setpieces/Vault.jsx'
 import LankaMap from './setpieces/LankaMap.jsx'
-import GalleryPlanes from './setpieces/GalleryPlanes.jsx'
 
 /**
  * Camera keyframes across the whole-page scroll progress: [p, z, frameX].
@@ -21,15 +20,15 @@ const CAM_KEYS = [
   [0.1, 7.5, -1.6],
   [0.22, 9, -1.9],
   [0.32, 10, -1.2],
-  [0.36, -33, -1.8],
-  [0.44, -33, -1.8],
+  [0.36, -34.5, -1.3],
+  [0.44, -34.5, -1.3],
   [0.52, -73, -1.8],
   [0.6, -73, -1.8],
   [0.68, -106.5, -1.6],
   [0.76, -108, -1.6],
-  [0.84, -140, 0],
-  [0.94, -161, 0],
-  [1.0, -172, 0],
+  [0.84, -141, 0],
+  [0.94, -149, 0],
+  [1.0, -152, 0],
 ]
 
 /** Scene palette: clean white/ice editorial world, always light. */
@@ -153,7 +152,7 @@ export default function WorldScene({ progressRef, reduce }) {
     if (scene.background) scene.background.copy(tmpColor)
     if (scene.fog) scene.fog.color.copy(tmpColor)
     // fade the whole stage out during the soft landing
-    const fade = p > 0.965 ? Math.max(0, 1 - (p - 0.965) / 0.03) : 1
+    const fade = p > 0.992 ? Math.max(0, 1 - (p - 0.992) / 0.008) : 1
     gl.domElement.style.opacity = String(fade)
   })
 
@@ -173,7 +172,6 @@ export default function WorldScene({ progressRef, reduce }) {
         <NeuralCore progressRef={progressRef} reduce={reduce} />
         <Vault progressRef={progressRef} reduce={reduce} />
         <LankaMap progressRef={progressRef} reduce={reduce} />
-        <GalleryPlanes progressRef={progressRef} reduce={reduce} />
       </Suspense>
     </>
   )

@@ -238,3 +238,18 @@ on beict.lk and Bhanuka Sir's own public social profiles; nothing invented.
   for most of each chapter's scroll. Beats now stagger in fast and STAY
   visible until the chapter ends.
 - Identity chapter name rendered white-on-white.
+
+## [3.3.0] — 2026-08-26 — Gallery rebuild + copy fixes
+### Changed
+- **Identity chapter copy** per feedback: headline is now "Theory. Revision.
+  Papers." and the body names Bhanuka Sir with how classes are conducted
+  (six halls + BEICT LMS) instead of the long paragraph.
+- **Gallery rebuilt as a scroll-driven DOM photo strip**: the eight class
+  photos render as 2:3 vertical cards (white mat, rounded, tilted) that slide
+  right-to-left with scroll. Replaces the 3D texture planes which rendered
+  black (three.js texture path unreliable for these sources). Native
+  `loading="lazy"`, zero texture-pipeline risk, fully accessible.
+- Neural Core + camera framing pulled back so the glass sphere sits fully in
+  frame beside the copy.
+- Gallery chapter extended to 97% of the track (removes the long blank tail
+  before the landing); stage fade retimed to the last 0.8%.
