@@ -22,6 +22,11 @@ content changes.
 | YouTube | https://www.youtube.com/channel/UC2vJHPJnfJNwr8DpdRMNE6g | beict.lk homepage capture (social links) |
 | Batch framing on site | "A/L Theory Batches", "Repeat & Revision", "Lessons & Resources" cards, captioned as reflecting categories published on lms.beict.lk | Derived from the Moodle category list above; the site explicitly says current availability is confirmed inside the LMS |
 | Footer credit | "Developed by Januth Nimnal" → https://januth.dev | Provided directly by the site owner (instruction, 2026-08-26) |
+| YouTube handle | @BhanukaEkanayaka | Live YouTube channel page (browser-rendered), checked 2026-08-26 |
+| YouTube stats | 80K subscribers · 332 videos | Live YouTube channel page, checked 2026-08-26 |
+| YouTube lesson titles | "2026 AL ICT \| Logic Gate - Part 01/02", "AL ICT 2025 Theory \| Operating System", "AVENZA 2026 \| BHANUKA EKANAYAKA", "සිසු අදහස් - Episode 03/04" | Live YouTube channel videos page, checked 2026-08-26 (titles verbatim; video ids from watch URLs) |
+| Facebook stats | 152K followers · "Leading ICT Teacher in Sri Lanka…" · Page · Tutor/Teacher · Horana, Sri Lanka · 100% recommend (9 reviews) | Live public Facebook page (visible without login), checked 2026-08-26 |
+| TikTok handle | @bhanuka_sir_official (link only — no stats) | Handle listed in the Facebook page intro (checked 2026-08-26). TikTok itself served a captcha, so follower/like counts are NOT verified and are not published |
 
 ## Deliberately NOT published (could not be verified)
 
@@ -38,3 +43,8 @@ content changes.
   site once hosting is restored, and update this table if anything changed.
 - The original site's footer credit ("Developed by Yashitha Nadiranga") applies to the old
   2022 WordPress site and is not carried over.
+- The Facebook intro lists phone **070 100 7003** while the archived beict.lk site says
+  **071 103 9004**. The site keeps the archived number; confirm with the owner which is
+  current before changing it. Both are real published numbers, neither is invented.
+- Social stats are snapshots ("checked 2026-08-26") and will drift — re-verify before
+  relying on them for any claims beyond display.

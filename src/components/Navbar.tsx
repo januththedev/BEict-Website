@@ -12,12 +12,31 @@ const lmsLinkProps = {
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [activeHref, setActiveHref] = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Scrollspy: highlight the nav link of the section currently in view
+  useEffect(() => {
+    const sections = NAV_LINKS.map((l) => document.getElementById(l.href.slice(1))).filter(
+      (el): el is HTMLElement => el !== null,
+    )
+    if (sections.length === 0 || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveHref(`#${entry.target.id}`)
+        }
+      },
+      { rootMargin: '-40% 0px -55% 0px' },
+    )
+    sections.forEach((s) => observer.observe(s))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -45,7 +64,12 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-slate-body transition-colors hover:text-brand-700"
+              aria-current={activeHref === link.href ? 'true' : undefined}
+              className={`relative text-sm font-medium transition-colors after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:rounded-full after:bg-brand-600 after:transition-all ${
+                activeHref === link.href
+                  ? 'text-brand-700 after:w-full'
+                  : 'text-slate-body after:w-0 hover:text-brand-700'
+              }`}
             >
               {link.label}
             </a>

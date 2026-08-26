@@ -1,5 +1,6 @@
 import { SITE } from '../data/content'
 import { ArrowUpRightIcon } from './Icons'
+import { HeroCanvas } from './HeroCanvas'
 import { Reveal, btnGhost, btnPrimary } from './ui'
 
 /** Faint blueprint-grid + circuit decoration behind the hero. Pure SVG/CSS,
@@ -47,6 +48,7 @@ export function Hero() {
   return (
     <section id="home" className="relative overflow-hidden pt-16" aria-labelledby="hero-title">
       <HeroBackdrop />
+      <HeroCanvas />
       <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-24 lg:pt-28">
         <Reveal>
           <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 shadow-card">

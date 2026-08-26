@@ -1,9 +1,12 @@
 import { Navbar } from './components/Navbar'
+import { ScrollProgress } from './components/ScrollProgress'
 import { Hero } from './components/Hero'
 import { About } from './components/About'
 import { Batches } from './components/Batches'
+import { CoreSection } from './components/CoreSection'
 import { LmsSection } from './components/LmsSection'
 import { PromoBanners } from './components/PromoBanners'
+import { Community } from './components/Community'
 import { Contact } from './components/Contact'
 import { Footer } from './components/Footer'
 
@@ -16,13 +19,16 @@ export default function App() {
       >
         Skip to main content
       </a>
+      <ScrollProgress />
       <Navbar />
       <main id="main">
         <Hero />
         <About />
         <Batches />
+        <CoreSection />
         <LmsSection />
         <PromoBanners />
+        <Community />
         <Contact />
       </main>
       <Footer />

@@ -39,6 +39,7 @@ export function LmsSection() {
         <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           <div className="flex flex-col gap-6">
             <SectionHeading
+              id="lms-title"
               align="left"
               dark
               eyebrow="BICT Online"

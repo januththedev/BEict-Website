@@ -26,6 +26,7 @@ export function Reveal({ children, className = '', delay = 0 }: RevealProps) {
 }
 
 interface SectionHeadingProps {
+  id: string
   eyebrow: string
   title: string
   lede?: string
@@ -33,7 +34,7 @@ interface SectionHeadingProps {
   dark?: boolean
 }
 
-export function SectionHeading({ eyebrow, title, lede, align = 'center', dark = false }: SectionHeadingProps) {
+export function SectionHeading({ id, eyebrow, title, lede, align = 'center', dark = false }: SectionHeadingProps) {
   const alignment = align === 'center' ? 'items-center text-center' : 'items-start text-left'
   return (
     <Reveal className={`flex flex-col gap-3 ${alignment}`}>
@@ -45,6 +46,7 @@ export function SectionHeading({ eyebrow, title, lede, align = 'center', dark = 
         {eyebrow}
       </span>
       <h2
+        id={id}
         className={`max-w-2xl font-display text-3xl font-bold tracking-tight sm:text-4xl ${
           dark ? 'text-white' : 'text-ink'
         }`}

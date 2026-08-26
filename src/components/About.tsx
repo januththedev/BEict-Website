@@ -20,6 +20,7 @@ export function About() {
     <section id="about" className="bg-white py-20 sm:py-24" aria-labelledby="about-title">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
+          id="about-title"
           eyebrow="About BEICT"
           title="ICT tuition, built around the A/L syllabus"
           lede="BEICT — Bhanuka Ekanayaka ICT — prepares G.C.E. Advanced Level students for Information & Communication Technology, taught in Sinhala medium, alongside a dedicated online learning system."

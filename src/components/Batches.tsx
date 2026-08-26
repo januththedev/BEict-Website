@@ -2,6 +2,7 @@ import { BATCHES, SITE } from '../data/content'
 import type { Batch } from '../data/content'
 import { ArrowUpRightIcon, BookOpenIcon, MonitorIcon, RepeatIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
+import { useTilt } from '../hooks/useTilt'
 
 const BATCH_ICONS = {
   'al-theory': BookOpenIcon,
@@ -11,9 +12,13 @@ const BATCH_ICONS = {
 
 function BatchCard({ batch, delay }: { batch: Batch; delay: number }) {
   const Icon = BATCH_ICONS[batch.id as keyof typeof BATCH_ICONS] ?? BookOpenIcon
+  const tilt = useTilt<HTMLElement>(5)
   return (
     <Reveal delay={delay} className="h-full">
-      <article className="group flex h-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lift">
+      <article
+        ref={tilt}
+        className="group flex h-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-7 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lift"
+      >
         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
           <Icon className="h-6 w-6" />
         </span>
@@ -41,6 +46,7 @@ export function Batches() {
     <section id="batches" className="bg-ice py-20 sm:py-24" aria-labelledby="batches-title">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
+          id="batches-title"
           eyebrow="Batches"
           title="Find your place on the learning system"
           lede="Courses are organised by examination batch inside the BEICT online learning system. Sign in to see the batches currently open for enrolment."

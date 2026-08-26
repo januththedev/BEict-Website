@@ -60,6 +60,7 @@ export function Contact() {
     <section id="contact" className="bg-white py-20 sm:py-24" aria-labelledby="contact-title">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
+          id="contact-title"
           eyebrow="Contact"
           title="Get in touch"
           lede={`Questions about classes or the online learning system? Reach out any day between 8.00 AM and 8.00 PM.`}

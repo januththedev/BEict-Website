@@ -31,7 +31,115 @@ export const SITE = {
   /** Site developer credit — provided directly by the site owner (2026-08-26). */
   developerName: 'Januth Nimnal',
   developerUrl: 'https://januth.dev',
+  /**
+   * Social presence — verified live 2026-08-26 (see CONTENT-AUDIT.md):
+   *  - YouTube channel page: @BhanukaEkanayaka, 80K subscribers, 332 videos
+   *  - Facebook page (public, no login): 152K followers, "Leading ICT Teacher in
+   *    Sri Lanka…", Horana, 100% recommend (9 reviews), intro lists the
+   *    bhanuka_sir_official + BhanukaEkanayaka handles and lms.beict.lk
+   *  - TikTok: handle confirmed via the Facebook intro; stats behind a captcha,
+   *    so link only — no numbers published.
+   */
+  youtubeHandle: '@BhanukaEkanayaka',
+  youtubeSubscribers: '80K',
+  youtubeVideoCount: '332',
+  facebookFollowers: '152K',
+  facebookRecommend: '100% recommend (9 reviews)',
+  tiktokUrl: 'https://www.tiktok.com/@bhanuka_sir_official',
+  tiktokHandle: '@bhanuka_sir_official',
 } as const
+
+/** Latest public lessons on the YouTube channel (titles verbatim, checked
+ * 2026-08-26). `id` is the YouTube video id — thumbnails come from i.ytimg.com. */
+export interface LessonVideo {
+  id: string
+  title: string
+  duration: string
+  url: string
+}
+
+export const LESSON_VIDEOS: LessonVideo[] = [
+  {
+    id: 'eYi-Jm-SdMw',
+    title: '2026 AL ICT | Logic Gate - Part 02',
+    duration: '1:46:14',
+    url: 'https://www.youtube.com/watch?v=eYi-Jm-SdMw',
+  },
+  {
+    id: 'ucSt6qmxejY',
+    title: '2026 AL ICT | Logic Gate - Part 01',
+    duration: '1:49:57',
+    url: 'https://www.youtube.com/watch?v=ucSt6qmxejY',
+  },
+  {
+    id: 'FL_xJNMIbwM',
+    title: 'AL ICT 2025 Theory | Operating System',
+    duration: '0:39',
+    url: 'https://www.youtube.com/watch?v=FL_xJNMIbwM',
+  },
+  {
+    id: '2DVJFOgnN4k',
+    title: 'AVENZA 2026 | BHANUKA EKANAYAKA',
+    duration: '2:27',
+    url: 'https://www.youtube.com/watch?v=2DVJFOgnN4k',
+  },
+]
+
+/** Topics orbiting the interactive 3D "BEICT Core". Names come from the
+ * verified public lesson titles above (or the LMS); links point at the
+ * matching lesson, the channel, or the LMS. */
+export interface CoreTopic {
+  id: string
+  label: string
+  hint: string
+  href?: string
+  external?: boolean
+}
+
+export const CORE_TOPICS: CoreTopic[] = [
+  {
+    id: 'logic-gates',
+    label: 'Logic Gates',
+    hint: 'Full two-part lesson on the channel',
+    href: 'https://www.youtube.com/watch?v=ucSt6qmxejY',
+    external: true,
+  },
+  {
+    id: 'os',
+    label: 'Operating Systems',
+    hint: '2025 Theory lesson on the channel',
+    href: 'https://www.youtube.com/watch?v=FL_xJNMIbwM',
+    external: true,
+  },
+  {
+    id: 'theory',
+    label: 'A/L Theory',
+    hint: 'Sinhala-medium theory classes',
+    href: 'https://www.youtube.com/@BhanukaEkanayaka',
+    external: true,
+  },
+  {
+    id: 'revision',
+    label: 'Revision',
+    hint: 'Repeat & revision track on the LMS',
+    href: SITE.lmsUrl,
+    external: true,
+  },
+  {
+    id: 'student-voices',
+    label: 'Student Voices',
+    hint: 'සිසු අදහස් series on the channel',
+    href: 'https://www.youtube.com/watch?v=qXdZE8FHEt0',
+    external: true,
+  },
+  {
+    id: 'lms',
+    label: 'BICT Online',
+    hint: 'Lessons & resources at lms.beict.lk',
+    href: SITE.lmsUrl,
+    external: true,
+  },
+]
 
 export interface NavLink {
   label: string
@@ -43,6 +151,7 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'About', href: '#about' },
   { label: 'Batches', href: '#batches' },
   { label: 'Online Learning', href: '#lms' },
+  { label: 'Community', href: '#community' },
   { label: 'Contact', href: '#contact' },
 ]
 

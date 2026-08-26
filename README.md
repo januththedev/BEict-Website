@@ -31,12 +31,18 @@ Edit content there — not inside components.
 
 ```
 src/
-├── components/       # Navbar, Hero, About, Batches, LmsSection, PromoBanners, Contact, Footer
+├── components/       # Navbar, Hero, About, Batches, CoreSection, LmsSection,
+│   │                 # PromoBanners, Community, Contact, Footer, ScrollProgress
 │   ├── Icons.tsx     # inline SVG icon set (no icon library)
 │   ├── Logo.tsx      # inline SVG brand mark
+│   ├── HeroCanvas.tsx# WebGL hero backdrop wrapper (SVG-grid fallback)
 │   └── ui.tsx        # shared buttons, Reveal (scroll fade-up), SectionHeading
+├── three/            # Three.js scenes (dynamically imported, lazy chunk)
+│   ├── runSceneCanvas.ts  # shared loop: DPR cap, auto-pause, dispose
+│   ├── HeroField.ts       # pointer-parallax particle network
+│   └── CoreScene.ts       # interactive draggable "BEICT Core"
 ├── data/content.ts   # single source of truth for all copy & links
-├── hooks/useReveal.ts# IntersectionObserver scroll-reveal (respects reduced motion)
+├── hooks/            # useReveal, useInView/useCountUp, useTilt
 ├── App.tsx           # page composition
 ├── main.tsx          # entry; imports self-hosted fonts (@fontsource)
 └── index.css         # Tailwind v4 @theme tokens (brand blues, navy, fonts) + reveal CSS
@@ -47,6 +53,15 @@ public/
 └── images/           # og-image.png, banners/*.webp
 qa/                   # browser QA screenshots taken during the 2026-08-26 build
 ```
+
+## Interactive (WebGL) sections
+
+- **Hero field** and **BEICT Core** use Three.js, loaded via dynamic `import()` so the
+  core page bundle never includes it. Both scenes pause automatically when off-screen or
+  when the tab is hidden, cap `devicePixelRatio` at 1.75, and fully dispose on unmount.
+- Every 3D feature degrades gracefully: no WebGL or `prefers-reduced-motion` means the
+  static SVG grid / plain buttons are used instead — no content is ever locked behind
+  WebGL. All core topics are duplicated as real links below the canvas.
 
 ## LMS integration (by design)
 
