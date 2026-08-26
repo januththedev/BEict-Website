@@ -50,6 +50,8 @@ export function Batches() {
           eyebrow="Batches"
           title="Find your place on the learning system"
           lede="Courses are organised by examination batch inside the BEICT online learning system. Sign in to see the batches currently open for enrolment."
+          variant="slide-x"
+          from="left"
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -64,6 +64,8 @@ export function Contact() {
           eyebrow="Contact"
           title="Get in touch"
           lede={`Questions about classes or the online learning system? Reach out any day between 8.00 AM and 8.00 PM.`}
+          variant="slide-x"
+          from="right"
         />
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">

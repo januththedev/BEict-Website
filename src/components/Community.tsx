@@ -115,6 +115,7 @@ export function Community() {
           eyebrow="Community"
           title="The classroom never stops"
           lede="Full lessons, seminar recaps and student stories — published publicly for every A/L ICT student. Numbers below are live from the platforms."
+          variant="mask"
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-3">

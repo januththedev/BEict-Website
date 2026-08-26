@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useReveal } from '../hooks/useReveal'
-import { BlurIn, TextReveal } from './TextReveal'
+import { BlurIn, TextReveal, type TextVariant } from './TextReveal'
 /** Consistent button styling shared by every CTA on the site. */
 export const btnPrimary =
   'inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:translate-y-0'
@@ -34,9 +34,23 @@ interface SectionHeadingProps {
   lede?: string
   align?: 'left' | 'center'
   dark?: boolean
+  /** Text reveal style for the title — vary them across the page. */
+  variant?: TextVariant
+  /** For slide-x titles: which edge words come in from. */
+  from?: 'left' | 'right'
 }
 
-export function SectionHeading({ id, eyebrow, index, title, lede, align = 'center', dark = false }: SectionHeadingProps) {
+export function SectionHeading({
+  id,
+  eyebrow,
+  index,
+  title,
+  lede,
+  align = 'center',
+  dark = false,
+  variant = 'mask',
+  from = 'left',
+}: SectionHeadingProps) {
   const alignment = align === 'center' ? 'items-center text-center' : 'items-start text-left'
   return (
     <div className={`flex flex-col gap-3 ${alignment}`}>
@@ -52,6 +66,8 @@ export function SectionHeading({ id, eyebrow, index, title, lede, align = 'cente
       <TextReveal
         as="h2"
         id={id}
+        variant={variant}
+        from={from}
         delay={80}
         className={`max-w-2xl font-display text-3xl font-bold tracking-tight sm:text-4xl ${
           dark ? 'text-white' : 'text-ink'

@@ -65,8 +65,9 @@ export function Hero() {
 
             <TextReveal
               as="p"
-              delay={300}
-              step={30}
+              variant="letters"
+              delay={350}
+              step={22}
               className="mt-5 font-display text-lg font-semibold text-brand-600"
             >
               {SITE.subject}

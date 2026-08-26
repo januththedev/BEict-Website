@@ -45,6 +45,7 @@ export function LmsSection() {
               eyebrow="BICT Online"
               title="The BEICT Online Learning System"
               lede="The classroom doesn't close when the lesson ends. lms.beict.lk is where BEICT students find their courses, materials and updates — from anywhere."
+              variant="scale"
             />
             <Reveal delay={140}>
               <p className="font-sinhala text-lg leading-relaxed text-brand-100">

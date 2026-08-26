@@ -56,10 +56,17 @@ body {
 }
 
 /* ---- Text motion system (see components/TextReveal.tsx) -----------------
-   Armed only when JS is running AND motion is allowed; `.in-view` releases
-   the animation. Without JS nothing is ever hidden. */
-.tr-armed .tr-word {
+   Five reveal variants, armed only when JS is running AND motion is allowed;
+   `.in-view` releases the animation. Without JS nothing is ever hidden. */
+
+.tr-armed .tr-word,
+.tr-armed .tr-nowrap {
   display: inline-block;
+  white-space: nowrap;
+}
+
+/* 1 · mask — word slides up out of an overflow mask (hero signature) */
+.tr-v-mask .tr-word {
   overflow: hidden;
   vertical-align: bottom;
   /* room for descenders (g, y, p) and italic overhang inside the mask */
@@ -69,17 +76,90 @@ body {
   margin-right: -0.06em;
 }
 
-.tr-armed .tr-word > span {
+.tr-v-mask .tr-word > span {
   display: inline-block;
   transform: translateY(120%);
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
-.tr-armed.in-view .tr-word > span {
+.tr-v-mask.in-view .tr-word > span {
   transform: translateY(0);
 }
 
+/* 2 · letters — character-by-character stagger */
+.tr-v-letters .tr-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.45em);
+  transition:
+    opacity 0.4s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tr-v-letters.in-view .tr-char {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 3 · flip — words flip up on the X axis */
+.tr-v-flip {
+  perspective: 700px;
+}
+
+.tr-v-flip .tr-word > span {
+  display: inline-block;
+  opacity: 0;
+  transform: rotateX(-85deg) translateY(0.35em);
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+}
+
+.tr-v-flip.in-view .tr-word > span {
+  opacity: 1;
+  transform: rotateX(0) translateY(0);
+}
+
+/* 4 · slide-x — words slide in horizontally */
+.tr-v-slide-x .tr-word > span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-40px);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease;
+}
+
+.tr-v-slide-x.from-right .tr-word > span {
+  transform: translateX(40px);
+}
+
+.tr-v-slide-x.in-view .tr-word > span {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 5 · scale — words settle down from oversized + blurred */
+.tr-v-scale .tr-word > span {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(1.55);
+  filter: blur(8px);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.5s ease,
+    filter 0.6s ease;
+}
+
+.tr-v-scale.in-view .tr-word > span {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* block-level blur+rise (ledes, chips, CTAs) */
 .tr-armed .tr-blur {
   opacity: 0;
   transform: translateY(12px);
@@ -131,6 +211,7 @@ body {
   }
 
   .tr-armed .tr-word > span,
+  .tr-armed .tr-char,
   .tr-armed .tr-blur {
     opacity: 1;
     transform: none;

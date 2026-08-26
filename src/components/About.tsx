@@ -24,6 +24,7 @@ export function About() {
           eyebrow="About BEICT"
           title="ICT tuition, built around the A/L syllabus"
           lede="BEICT — Bhanuka Ekanayaka ICT — prepares G.C.E. Advanced Level students for Information & Communication Technology, taught in Sinhala medium, alongside a dedicated online learning system."
+          variant="flip"
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
