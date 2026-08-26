@@ -66,6 +66,48 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* ---- Text motion system (see components/TextReveal.tsx) -----------------
+   Armed only when JS is running AND motion is allowed; `.in-view` releases
+   the animation. Without JS nothing is ever hidden. */
+.tr-armed .tr-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* room for descenders (g, y, p) and italic overhang inside the mask */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  padding-right: 0.06em;
+  margin-right: -0.06em;
+}
+
+.tr-armed .tr-word > span {
+  display: inline-block;
+  transform: translateY(120%);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.tr-armed.in-view .tr-word > span {
+  transform: translateY(0);
+}
+
+.tr-armed .tr-blur {
+  opacity: 0;
+  transform: translateY(12px);
+  filter: blur(10px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease,
+    filter 0.7s ease;
+  transition-delay: var(--tr-delay, 0ms);
+}
+
+.tr-armed.in-view .tr-blur {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
 /* Visible, consistent keyboard focus everywhere */
 :focus-visible {
   outline: 2px solid var(--color-brand-600);
@@ -96,6 +138,14 @@ body {
   .reveal {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+
+  .tr-armed .tr-word > span,
+  .tr-armed .tr-blur {
+    opacity: 1;
+    transform: none;
+    filter: none;
     transition: none;
   }
 

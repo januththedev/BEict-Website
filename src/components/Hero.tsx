@@ -1,6 +1,7 @@
 import { SITE } from '../data/content'
 import { ArrowUpRightIcon } from './Icons'
 import { HeroCanvas } from './HeroCanvas'
+import { BlurIn, TextReveal } from './TextReveal'
 import { Reveal, btnGhost, btnPrimary } from './ui'
 
 /** Faint blueprint-grid decoration behind the hero. Pure SVG/CSS, no image
@@ -53,32 +54,48 @@ export function Hero() {
         {/* Glass panel: keeps the headline readable over the WebGL field */}
         <Reveal>
           <div className="rounded-[2rem] border border-white/70 bg-white/60 p-6 shadow-lift backdrop-blur-2xl sm:p-10 lg:p-12">
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700">
+            <BlurIn
+              as="span"
+              delay={150}
+              className="inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-brand-700"
+            >
               <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
               {SITE.level} · {SITE.medium}
-            </span>
+            </BlurIn>
 
-            <p className="mt-5 font-accent text-2xl text-slate-body sm:text-3xl">
+            <TextReveal
+              as="p"
+              delay={300}
+              step={30}
+              className="mt-5 font-accent text-2xl text-slate-body sm:text-3xl"
+            >
               Information &amp; Communication Technology
-            </p>
-            <h1
+            </TextReveal>
+            <TextReveal
+              as="h1"
               id="hero-title"
+              delay={480}
+              step={55}
               className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
             >
               Learn it once.{' '}
               <span className="font-accent font-normal text-brand-600">
                 Learn it with Bhanuka Ekanayaka.
               </span>
-            </h1>
+            </TextReveal>
 
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body">
+            <BlurIn
+              as="p"
+              delay={950}
+              className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body"
+            >
               A/L ICT in <span className="text-highlight font-medium text-ink">Sinhala medium</span> —
               in class, on YouTube, and in your pocket on{' '}
               <span className="text-highlight font-medium text-ink">lms.beict.lk</span>. You bring
               the effort; the structure is already here.
-            </p>
+            </BlurIn>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">
               <a href={SITE.lmsUrl} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
                 Get Started Learning Now
                 <ArrowUpRightIcon className="h-4 w-4" />
@@ -87,11 +104,15 @@ export function Hero() {
               <a href="#contact" className={btnGhost}>
                 Contact Us
               </a>
-            </div>
+            </BlurIn>
 
-            <p className="mt-6 border-t border-white/70 pt-4 font-sinhala text-base text-slate-body">
+            <BlurIn
+              as="p"
+              delay={1300}
+              className="mt-6 border-t border-white/70 pt-4 font-sinhala text-base text-slate-body"
+            >
               {SITE.sinhalaLmsInvite}
-            </p>
+            </BlurIn>
           </div>
         </Reveal>
       </div>

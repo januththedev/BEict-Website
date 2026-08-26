@@ -1,14 +1,21 @@
 interface LogoProps {
   /** `dark` renders the wordmark for dark backgrounds. */
   variant?: 'light' | 'dark'
+  /** Slimmer lockup for the navbar pill. */
+  compact?: boolean
 }
 
 /** Inline BEICT mark: gradient monogram tile + wordmark.
  * Drawn as SVG so no image request is needed and it stays crisp everywhere. */
-export function Logo({ variant = 'light' }: LogoProps) {
+export function Logo({ variant = 'light', compact = false }: LogoProps) {
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <svg viewBox="0 0 40 40" className="h-9 w-9 shrink-0" role="img" aria-label="BEICT logo">
+    <span className="inline-flex items-center gap-2">
+      <svg
+        viewBox="0 0 40 40"
+        className={compact ? 'h-7 w-7 shrink-0' : 'h-9 w-9 shrink-0'}
+        role="img"
+        aria-label="BEICT logo"
+      >
         <defs>
           <linearGradient id="beict-mark" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#1e4fd8" />
@@ -29,18 +36,18 @@ export function Logo({ variant = 'light' }: LogoProps) {
           BE
         </text>
       </svg>
-      <span className="leading-tight">
+      <span className="leading-none">
         <span
-          className={`block font-display text-lg font-bold tracking-tight ${
-            variant === 'dark' ? 'text-white' : 'text-ink'
-          }`}
+          className={`block font-display font-bold tracking-tight ${
+            compact ? 'text-[15px]' : 'text-lg'
+          } ${variant === 'dark' ? 'text-white' : 'text-ink'}`}
         >
           BEICT
         </span>
         <span
-          className={`block text-[11px] font-medium tracking-wide ${
-            variant === 'dark' ? 'text-brand-200' : 'text-slate-body'
-          }`}
+          className={`mt-0.5 block font-medium tracking-wide ${
+            compact ? 'text-[9px]' : 'text-[11px]'
+          } ${variant === 'dark' ? 'text-brand-200' : 'text-slate-body'}`}
         >
           Bhanuka Ekanayaka ICT
         </span>

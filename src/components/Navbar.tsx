@@ -49,27 +49,27 @@ export function Navbar() {
   }, [open])
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-2.5 sm:px-6 sm:pt-3">
       <div className="mx-auto max-w-6xl">
-        {/* Floating pill */}
+        {/* Floating pill — kept deliberately slim */}
         <div
-          className={`flex items-center justify-between gap-3 rounded-full border py-2 pl-4 pr-2 transition-all duration-300 sm:pl-5 ${
+          className={`flex items-center justify-between gap-3 rounded-full border py-1.5 pl-3.5 pr-1.5 transition-all duration-300 sm:pl-4 ${
             scrolled || open
               ? 'border-white/70 bg-white/85 shadow-lift backdrop-blur-2xl'
               : 'border-white/50 bg-white/60 backdrop-blur-xl'
           }`}
         >
           <a href="#home" className="shrink-0 rounded-md" aria-label="BEICT — back to top">
-            <Logo />
+            <Logo compact />
           </a>
 
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-5 lg:flex" aria-label="Primary">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 aria-current={activeHref === link.href ? 'true' : undefined}
-                className={`relative text-sm font-medium transition-colors after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:rounded-full after:bg-brand-600 after:transition-all ${
+                className={`relative text-[13px] font-medium transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:rounded-full after:bg-brand-600 after:transition-all ${
                   activeHref === link.href
                     ? 'text-brand-700 after:w-full'
                     : 'text-slate-body after:w-0 hover:text-brand-700'
@@ -80,24 +80,24 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <a
               {...lmsLinkProps}
-              className="hidden items-center gap-1.5 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift active:translate-y-0 sm:inline-flex"
+              className="hidden items-center gap-1 rounded-full bg-brand-600 px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift active:translate-y-0 sm:inline-flex"
             >
               LMS Login
-              <ArrowUpRightIcon className="h-4 w-4" />
+              <ArrowUpRightIcon className="h-3.5 w-3.5" />
               <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
             </a>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-ink transition-colors hover:bg-brand-50 lg:hidden"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-ink transition-colors hover:bg-brand-50 lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? 'Close menu' : 'Open menu'}
               onClick={() => setOpen((v) => !v)}
             >
-              {open ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+              {open ? <CloseIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
             </button>
           </div>
         </div>
@@ -106,15 +106,15 @@ export function Navbar() {
         {open && (
           <div
             id="mobile-menu"
-            className="mt-2 rounded-3xl border border-white/70 bg-white/90 p-3 shadow-lift backdrop-blur-2xl lg:hidden"
+            className="mt-2 rounded-3xl border border-white/70 bg-white/90 p-2 shadow-lift backdrop-blur-2xl lg:hidden"
           >
-            <nav className="flex flex-col gap-1" aria-label="Mobile">
+            <nav className="flex flex-col gap-0.5" aria-label="Mobile">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className={`rounded-2xl px-4 py-3 text-base font-medium transition-colors ${
+                  className={`rounded-2xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
                     activeHref === link.href
                       ? 'bg-brand-50 text-brand-700'
                       : 'text-ink hover:bg-brand-50 hover:text-brand-700'
@@ -125,10 +125,10 @@ export function Navbar() {
               ))}
               <a
                 {...lmsLinkProps}
-                className="mt-1 inline-flex items-center justify-between rounded-2xl bg-brand-600 px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-brand-700"
+                className="mt-1 inline-flex items-center justify-between rounded-2xl bg-brand-600 px-4 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-brand-700"
               >
                 <span>LMS Login</span>
-                <span className="flex items-center gap-1 text-sm font-medium text-brand-100">
+                <span className="flex items-center gap-1 text-[13px] font-medium text-brand-100">
                   lms.beict.lk <ArrowUpRightIcon className="h-4 w-4" />
                 </span>
               </a>
