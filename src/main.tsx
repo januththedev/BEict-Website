@@ -5,8 +5,6 @@ import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/sora'
 import '@fontsource-variable/inter'
 import '@fontsource-variable/noto-sans-sinhala'
-import '@fontsource/instrument-serif'
-import '@fontsource/instrument-serif/400-italic.css'
 
 import './index.css'
 import App from './App.tsx'

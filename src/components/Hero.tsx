@@ -67,9 +67,9 @@ export function Hero() {
               as="p"
               delay={300}
               step={30}
-              className="mt-5 font-accent text-2xl text-slate-body sm:text-3xl"
+              className="mt-5 font-display text-lg font-semibold text-brand-600"
             >
-              Information &amp; Communication Technology
+              {SITE.subject}
             </TextReveal>
             <TextReveal
               as="h1"
@@ -79,7 +79,7 @@ export function Hero() {
               className="mt-1 max-w-3xl font-display text-4xl font-extrabold leading-[1.06] tracking-tight text-ink sm:text-6xl"
             >
               Learn ICT with{' '}
-              <span className="font-accent font-normal text-brand-600">Bhanuka Ekanayaka</span>
+              <span className="text-gradient-brand">Bhanuka Ekanayaka</span>
             </TextReveal>
 
             <BlurIn
@@ -87,10 +87,9 @@ export function Hero() {
               delay={950}
               className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body"
             >
-              BEICT prepares G.C.E. Advanced Level students in{' '}
-              <span className="text-highlight font-medium text-ink">Sinhala medium</span> — with
-              classes and a complete online learning system at{' '}
-              <span className="text-highlight font-medium text-ink">lms.beict.lk</span>.
+              BEICT prepares G.C.E. Advanced Level students in Sinhala medium — with classes and
+              a complete online learning system at{' '}
+              <span className="font-semibold text-ink">lms.beict.lk</span>.
             </BlurIn>
 
             <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">

@@ -46,7 +46,7 @@ export function PromoBanners() {
           id="promos-title"
           eyebrow="Stay connected"
           title="Never miss an update"
-          lede="Seminar news lands on Facebook first, lessons land on the LMS — and a WhatsApp message gets you a straight answer."
+          lede="Announcements, online lessons and new-batch news — three places to keep up with BEICT."
         />
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">

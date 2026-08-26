@@ -14,8 +14,8 @@ export function Footer() {
         <div className="flex flex-col items-start gap-4">
           <Logo variant="dark" />
           <p className="max-w-xs text-sm leading-relaxed">
-            A/L ICT in Sinhala medium — taught in class, shared on YouTube, and always open on
-            the learning system.
+            {SITE.subject} for the {SITE.level} — in Sinhala medium. Classes plus a complete
+            online learning system.
           </p>
           <div className="flex gap-3">
             <a

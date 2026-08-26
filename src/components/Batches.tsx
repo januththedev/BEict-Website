@@ -47,11 +47,9 @@ export function Batches() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           id="batches-title"
-          index="02"
           eyebrow="Batches"
-          align="left"
-          title="Find your batch"
-          lede="On the learning system, courses are organised by exam year — with a separate revision track for repeaters. Sign in and see where you fit."
+          title="Find your place on the learning system"
+          lede="Courses are organised by examination batch inside the BEICT online learning system. Sign in to see the batches currently open for enrolment."
         />
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
