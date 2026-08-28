@@ -1,10 +1,9 @@
 import { useCms } from '../cms/CmsProvider'
-import { AddItemButton, ItemControls, T } from '../cms/edit'
+import { AddItemButton, ItemControls, Link, T } from '../cms/edit'
 import { extractYouTubeId, type CmsVideo } from '../cms/schema'
 import { ArrowUpRightIcon, FacebookIcon, TiktokGlyph, YoutubeIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 import { useCountUp, useInView } from '../hooks/useCountUp'
-import { useTilt } from '../hooks/useTilt'
 
 /** Split the videos array: the first currently-live item is the hero, the rest
  * (and any non-live items in the array) populate the 4-up grid below. */
@@ -24,34 +23,37 @@ function StatCard({ path, index, delay }: { path: string; index: number; delay: 
   const cms = useCms()
   const stat = cms.c.community.stats[index]
   const { ref: inViewRef, inView } = useInView<HTMLAnchorElement>()
-  const tilt = useTilt<HTMLAnchorElement>(4)
   const count = useCountUp(stat.value, inView)
   const Icon = stat.brand === 'youtube' ? YoutubeIcon : FacebookIcon
 
   return (
     <Reveal delay={delay} className="h-full">
-      <a
-        ref={(node) => {
-          inViewRef.current = node
-          tilt.current = node
-        }}
-        href={stat.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="cms-item relative flex h-full flex-col gap-2 rounded-2xl border border-slate-100 bg-white p-6 shadow-card transition-all duration-200 hover:border-brand-200 hover:shadow-lift"
+      <Link
+        hrefPath={`${path}.href`}
+        fallback={stat.href}
+        item={path}
+        external
+        className="cms-item group relative flex h-full flex-col gap-2 rounded-2xl border border-slate-100 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lift"
         aria-label={`${stat.label}: ${stat.value}${stat.suffix} (opens in a new tab)`}
       >
-        <ItemControls path={path} removable={cms.c.community.stats.length > 1} />
-        <T p={`${path}.label`} as="span" className="block text-xs font-semibold uppercase tracking-wider text-slate-body" />
-        <span className="font-display text-5xl font-extrabold tracking-tight text-ink tabular-nums">
-          {count}
-          <span className="text-brand-600">{stat.suffix}</span>
+        <span
+          ref={(node) => {
+            inViewRef.current = node as HTMLAnchorElement | null
+          }}
+          className="flex h-full flex-col gap-2"
+        >
+          <ItemControls path={path} removable={cms.c.community.stats.length > 1} />
+          <T p={`${path}.label`} as="span" className="block text-xs font-semibold uppercase tracking-wider text-slate-body" />
+          <span className="font-display text-5xl font-extrabold tracking-tight text-ink tabular-nums">
+            {count}
+            <span className="text-brand-600">{stat.suffix}</span>
+          </span>
+          <span className="mt-auto flex items-center gap-1.5 pt-2 text-sm text-slate-body">
+            <Icon className="h-3.5 w-3.5 shrink-0 text-brand-600" />
+            <T p={`${path}.sub`} />
+          </span>
         </span>
-        <span className="mt-auto flex items-center gap-1.5 pt-2 text-sm text-slate-body">
-          <Icon className="h-3.5 w-3.5 shrink-0 text-brand-600" />
-          <T p={`${path}.sub`} />
-        </span>
-      </a>
+      </Link>
     </Reveal>
   )
 }
@@ -60,16 +62,15 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
   const cms = useCms()
   const video = cms.c.community.videos[index]
   const thumb = video.thumb || `https://i.ytimg.com/vi/${extractYouTubeId(video.url) ?? 'default'}/hqdefault.jpg`
-  const tilt = useTilt<HTMLAnchorElement>(5)
 
   return (
     <Reveal delay={delay} className="h-full">
-      <a
-        ref={tilt}
-        href={video.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="cms-item group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition-all duration-200 hover:border-brand-200 hover:shadow-lift"
+      <Link
+        hrefPath={`${path}.url`}
+        fallback={video.url}
+        item={path}
+        external
+        className="cms-item group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lift"
         aria-label={`Watch "${video.title}" on YouTube (opens in a new tab)`}
       >
         <ItemControls path={path} removable={cms.c.community.videos.length > 1} />
@@ -96,7 +97,7 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
             <ArrowUpRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </span>
         </span>
-      </a>
+      </Link>
     </Reveal>
   )
 }
@@ -104,16 +105,15 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
 function LiveHero({ path, video }: { path: string; video: CmsVideo }) {
   const cms = useCms()
   const thumb = video.thumb || `https://i.ytimg.com/vi/${extractYouTubeId(video.url) ?? 'default'}/hqdefault.jpg`
-  const tilt = useTilt<HTMLAnchorElement>(3)
   const isArrayItem = path.match(/\.(\d+)$/) !== null
   return (
     <Reveal>
-      <a
-        ref={tilt}
-        href={video.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="cms-item group block overflow-hidden rounded-2xl border border-red-200 bg-white shadow-card transition-all duration-200 hover:border-red-300 hover:shadow-lift"
+      <Link
+        hrefPath={`${path}.url`}
+        fallback={video.url}
+        item={path}
+        external
+        className="cms-item group block overflow-hidden rounded-2xl border border-red-200 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-lift"
         aria-label={`Watch "${video.title}" live on YouTube (opens in a new tab)`}
       >
         {isArrayItem && <ItemControls path={path} removable={cms.c.community.videos.length > 1} />}
@@ -157,7 +157,7 @@ function LiveHero({ path, video }: { path: string; video: CmsVideo }) {
             </span>
           </span>
         </div>
-      </a>
+      </Link>
     </Reveal>
   )
 }
@@ -191,17 +191,17 @@ export function Community() {
         <Reveal delay={200}>
           <p className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm text-slate-body">
             <T p="community.tiktokPre" />
-            <a
-              href={cms.c.site.tiktokUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              hrefPath="site.tiktokUrl"
+              fallback={cms.c.site.tiktokUrl}
+              external
               className="inline-flex items-center gap-1.5 font-semibold text-brand-700 hover:text-brand-600"
             >
               <TiktokGlyph className="h-3.5 w-3.5" />
-              {cms.c.site.tiktokLabel}
+              <T p="site.tiktokLabel" as="span" />
               <ArrowUpRightIcon className="h-3.5 w-3.5" />
               <span className="sr-only">(opens TikTok in a new tab)</span>
-            </a>
+            </Link>
           </p>
         </Reveal>
 
