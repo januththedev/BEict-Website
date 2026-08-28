@@ -1,44 +1,49 @@
 import { passwordMatches, sessionCookie, clientIp } from '../src/cms/server/session.js'
 import { checkLoginThrottle } from '../src/cms/server/db.js'
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
+function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...extraHeaders },
+  })
+}
 
-  try {
-    if (!process.env.ADMIN_PASSWORD) {
-      return Response.json({ error: 'ADMIN_PASSWORD is not configured — add it in Vercel and redeploy' }, { status: 500 })
-    }
+export default {
+  async fetch(req: Request): Promise<Response> {
+    if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
 
-    const ip = clientIp(req)
-    // Persistent throttle when Neon is configured; in-memory fallback otherwise.
-    let limited = false
     try {
-      limited = await checkLoginThrottle(ip)
-    } catch {
-      limited = false // never let throttle infrastructure block login
-    }
-    if (limited) {
-      return Response.json({ error: 'Too many attempts — wait 10 minutes' }, { status: 429 })
-    }
+      if (!process.env.ADMIN_PASSWORD) {
+        return json({ error: 'ADMIN_PASSWORD is not configured — add it in Vercel and redeploy' }, 500)
+      }
 
-    let password = ''
-    try {
-      const body = (await req.json()) as { password?: unknown }
-      password = typeof body.password === 'string' ? body.password : ''
-    } catch {
-      return Response.json({ error: 'Bad request' }, { status: 400 })
-    }
+      const ip = clientIp(req)
+      let limited = false
+      try {
+        limited = await checkLoginThrottle(ip)
+      } catch {
+        limited = false
+      }
+      if (limited) {
+        return json({ error: 'Too many attempts — wait 10 minutes' }, 429)
+      }
 
-    if (!(await passwordMatches(password))) {
-      return Response.json({ error: 'Wrong password' }, { status: 401 })
-    }
+      let password = ''
+      try {
+        const body = (await req.json()) as { password?: unknown }
+        password = typeof body.password === 'string' ? body.password : ''
+      } catch {
+        return json({ error: 'Bad request' }, 400)
+      }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', 'Set-Cookie': await sessionCookie() },
-    })
-  } catch (err) {
-    console.error('[cms] login crashed:', err)
-    return Response.json({ error: 'Login crashed — check the function logs in Vercel' }, { status: 500 })
-  }
+      if (!(await passwordMatches(password))) {
+        return json({ error: 'Wrong password' }, 401)
+      }
+
+      return json({ ok: true }, 200, { 'Set-Cookie': await sessionCookie() })
+    } catch (err) {
+      console.error('[cms] login crashed:', err)
+      return json({ error: 'Login crashed — check the function logs in Vercel' }, 500)
+    }
+  },
 }
