@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { CmsProvider } from './cms/CmsProvider'
 import { Site } from './components/Site'
 
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <CmsProvider>
       <Site />
+      <Analytics />
     </CmsProvider>
   )
 }
