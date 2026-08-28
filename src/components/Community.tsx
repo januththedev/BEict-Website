@@ -48,6 +48,7 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
   const cms = useCms()
   const video = cms.c.community.videos[index]
   const thumb = video.thumb || `https://i.ytimg.com/vi/${extractYouTubeId(video.url) ?? 'default'}/hqdefault.jpg`
+  const showDuration = video.duration && video.duration.trim().length > 0
 
   return (
     <Reveal delay={delay} className="h-full">
@@ -70,11 +71,13 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <T
-            p={`${path}.duration`}
-            as="span"
-            className="absolute bottom-2 right-2 rounded-md bg-black/80 px-1.5 py-0.5 font-mono text-[11px] font-medium text-white"
-          />
+          {showDuration && (
+            <T
+              p={`${path}.duration`}
+              as="span"
+              className="absolute bottom-2 right-2 rounded-md bg-black/80 px-1.5 py-0.5 font-mono text-[11px] font-medium text-white"
+            />
+          )}
         </span>
         <span className="flex flex-1 flex-col gap-1 p-4">
           <T p={`${path}.title`} as="span" className="block text-sm font-semibold leading-snug text-ink" />
