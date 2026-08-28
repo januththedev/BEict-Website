@@ -62,10 +62,6 @@ export interface CmsVideo {
   duration: string
   url: string
   thumb: string
-  /** YouTube `snippet.liveBroadcastContent`. `'none'` for regular VODs. */
-  liveBroadcastContent: 'live' | 'upcoming' | 'none'
-  /** Concurrent viewers — only meaningful when `liveBroadcastContent === 'live'`. */
-  concurrentViewers: number
 }
 
 export interface CmsContactCall {
@@ -364,8 +360,6 @@ export const defaultContent: CmsContent = {
       duration: v.duration,
       url: v.url,
       thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
-      liveBroadcastContent: 'none' as const,
-      concurrentViewers: 0,
     })),
   },
   contact: {
@@ -615,17 +609,11 @@ export function validateContent(input: unknown): CmsContent | null {
             typeof v?.thumb === 'string' && v.thumb.startsWith('https://')
               ? v.thumb
               : `https://i.ytimg.com/vi/${extractYouTubeId(url) ?? extractYouTubeId(fb.url) ?? ''}/hqdefault.jpg`
-          const liveRaw = v?.liveBroadcastContent
-          const liveBroadcastContent: 'live' | 'upcoming' | 'none' =
-            liveRaw === 'live' || liveRaw === 'upcoming' ? liveRaw : 'none'
-          const concurrentViewers = num(v?.concurrentViewers, 0)
           return {
             title: str(v?.title, fb.title, 160),
             duration: str(v?.duration, fb.duration, 12),
             url,
             thumb,
-            liveBroadcastContent,
-            concurrentViewers,
           }
         },
         LIMITS.videos.max,

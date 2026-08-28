@@ -1,25 +1,21 @@
 /**
  * YouTube channel sync for the CMS "Latest lessons" section.
  *
- * Runs on a Vercel Cron schedule (every 6 hours — see vercel.json). The
- * endpoint accepts requests with either the `x-vercel-cron` header (production
- * cron) OR a valid admin `cms_session` cookie (so the admin "Sync now" button
- * can trigger it manually). Any other caller gets 401.
+ * Runs on a Vercel Cron schedule (once a day at 20:00 UTC = 02:00 next day
+ * SLST — see vercel.json). The endpoint accepts requests with either the
+ * `x-vercel-cron` header (production cron) OR a valid admin `cms_session`
+ * cookie (so the admin can trigger it manually). Any other caller gets 401.
  *
  * Flow (YouTube Data API v3):
  *   1. channels.list         — get the uploads playlist id            (1 unit)
- *   2. playlistItems.list    — get the 6 most-recent video IDs         (1 unit)
- *   3. videos.list           — get title, duration, live state         (1 unit)
+ *   2. playlistItems.list    — get the 4 most-recent video IDs         (1 unit)
+ *   3. videos.list           — get title + duration                   (1 unit)
  * Net: 3 units per run. Default daily quota is 10,000.
  *
  * The sync respects `site.ytAutoSync` — if the admin has it OFF, the function
  * exits early without writing. The `site.ytLastSyncAt` field is bumped on
  * every successful run regardless, so the admin can see when the last
  * successful check happened.
- *
- * Promotes any currently-live video to position 0 so the public site's
- * LiveHero picks it up on the next page load (the live probe at
- * /api/youtube-live handles sub-6-hour freshness for the "live" flag itself).
  */
 
 import { isAuthed } from '../src/cms/server/session.js'
@@ -27,7 +23,7 @@ import { loadContent, saveContent } from '../src/cms/server/db.js'
 import { type CmsContent, type CmsVideo } from '../src/cms/schema.js'
 
 const DEFAULT_CHANNEL_ID = 'UC2vJHPJnfJNwr8DpdRMNE6g'
-const MAX_RESULTS = 6
+const MAX_RESULTS = 4
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -145,11 +141,11 @@ export default {
         return json({ ok: true, added: 0, removed: 0, total: 0, message: 'no videos found' })
       }
 
-      // 3) Hydrate each id with title, duration, liveBroadcastContent, concurrentViewers.
+      // 3) Hydrate each id with title + duration only.
       const vUrl =
-        `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,liveStreamingDetails` +
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails` +
         `&id=${ids.join(',')}` +
-        `&fields=items(id,snippet(title,liveBroadcastContent),contentDetails(duration),liveStreamingDetails(concurrentViewers,actualStartTime,actualEndTime))` +
+        `&fields=items(id,snippet(title),contentDetails(duration))` +
         `&key=${encodeURIComponent(apiKey)}`
       const vRes = await fetchWithTimeout(vUrl)
       if (!vRes.ok) {
@@ -160,9 +156,8 @@ export default {
       const vData = (await vRes.json()) as {
         items?: {
           id?: string
-          snippet?: { title?: string; liveBroadcastContent?: string }
+          snippet?: { title?: string }
           contentDetails?: { duration?: string }
-          liveStreamingDetails?: { concurrentViewers?: string | number; actualStartTime?: string; actualEndTime?: string }
         }[]
       }
 
@@ -172,27 +167,12 @@ export default {
       for (const id of ids) {
         const item = vData.items?.find((x) => x.id === id)
         if (!item) continue
-        const lbcRaw = item.snippet?.liveBroadcastContent
-        const liveBroadcastContent: 'live' | 'upcoming' | 'none' =
-          lbcRaw === 'live' || lbcRaw === 'upcoming' ? lbcRaw : 'none'
-        const cv = item.liveStreamingDetails?.concurrentViewers
-        const concurrentViewers =
-          typeof cv === 'number' ? cv : typeof cv === 'string' ? Number(cv) || 0 : 0
         fetched.push({
           title: (item.snippet?.title ?? '').slice(0, 160),
           duration: parseIsoDuration(item.contentDetails?.duration ?? 'PT0S'),
           url: `https://www.youtube.com/watch?v=${id}`,
           thumb: thumbnailUrl(id),
-          liveBroadcastContent,
-          concurrentViewers,
         })
-      }
-
-      // If anything is live, promote it to position 0.
-      const liveIdx = fetched.findIndex((v) => v.liveBroadcastContent === 'live')
-      if (liveIdx > 0) {
-        const [live] = fetched.splice(liveIdx, 1)
-        fetched.unshift(live)
       }
 
       // Diff against the saved videos — count adds/removes for the response.
@@ -225,7 +205,6 @@ export default {
         added,
         removed,
         total: fetched.length,
-        live: liveIdx >= 0,
         lastSyncAt: now,
       })
     } catch (err) {

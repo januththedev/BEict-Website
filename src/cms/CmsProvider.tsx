@@ -131,56 +131,6 @@ export function CmsProvider({ children, edit = false, initialContent, onAuthFail
     }
   }, [edit, initialContent])
 
-  // Public site: probe YouTube for the live state of the most-recent video.
-  // Merges the result into the in-memory videos array so the LiveHero can
-  // appear within ~2 minutes of a stream starting, independent of the
-  // 6-hour cron that refreshes the underlying video list. Fail-soft: any
-  // network or quota error is a no-op and the page falls back to the
-  // saved `liveBroadcastContent` value (which the cron may have set
-  // earlier).
-  useEffect(() => {
-    if (edit || initialContent) return
-    let cancelled = false
-    fetch('/api/youtube-live', { credentials: 'omit' })
-      .then(async (r) => {
-        if (!r.ok) return null
-        return (await r.json()) as {
-          id?: string
-          liveBroadcastContent?: 'live' | 'upcoming' | 'none'
-          concurrentViewers?: number
-        }
-      })
-      .then((probe) => {
-        if (cancelled || !probe || !probe.id) return
-        setC((prev) => {
-          const videos = prev.community?.videos
-          if (!videos || videos.length === 0) return prev
-          const idx = videos.findIndex((v) => v.url.includes(probe.id!))
-          if (idx === -1) return prev
-          const current = videos[idx]
-          const nextLbc = probe.liveBroadcastContent ?? current.liveBroadcastContent
-          const nextCv = probe.concurrentViewers ?? current.concurrentViewers
-          if (current.liveBroadcastContent === nextLbc && current.concurrentViewers === nextCv) return prev
-          const draft = deepClone(prev)
-          const target = draft.community.videos[idx]
-          target.liveBroadcastContent = nextLbc
-          target.concurrentViewers = nextCv
-          // Promote the live item to position 0 so the LiveHero picks it up.
-          if (nextLbc === 'live' && idx !== 0) {
-            const [item] = draft.community.videos.splice(idx, 1)
-            draft.community.videos.unshift(item)
-          }
-          return draft
-        })
-      })
-      .catch(() => {
-        /* probe is best-effort — saved value stands */
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [edit, initialContent])
-
   const get = useCallback((path: string) => String(getPath(c, path) ?? ''), [c])
 
   const mutate = useCallback((fn: (draft: CmsContent) => void) => {

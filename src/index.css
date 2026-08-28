@@ -176,22 +176,7 @@ body {
   color: #b91c1c;
 }
 
-/* Live hero — pulsing dot inside the red "Live" badge. Pure CSS, no JS. */
-@keyframes cms-live-pulse {
-  0%, 100% { transform: scale(1);   opacity: 1; }
-  50%      { transform: scale(1.4); opacity: 0.45; }
-}
-.cms-live-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 9999px;
-  background: #fff;
-  animation: cms-live-pulse 1.2s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cms-live-dot { animation: none; }
-}
+/* (live hero removed — once-a-day cron handles the latest lessons grid) */
 
 .edit-on .cms-add-btn {
   display: block;
