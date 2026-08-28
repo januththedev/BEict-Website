@@ -33,3 +33,5 @@ dist-ssr
 cms.local.json
 .tmp/
 cms-uploads/
+
+.vercel

@@ -62,6 +62,10 @@ export interface CmsVideo {
   duration: string
   url: string
   thumb: string
+  /** YouTube `snippet.liveBroadcastContent`. `'none'` for regular VODs. */
+  liveBroadcastContent: 'live' | 'upcoming' | 'none'
+  /** Concurrent viewers — only meaningful when `liveBroadcastContent === 'live'`. */
+  concurrentViewers: number
 }
 
 export interface CmsContactCall {
@@ -114,6 +118,11 @@ export interface CmsContent {
     tiktokLabel: string
     developerName: string
     developerUrl: string
+    /** When true, the /api/youtube-sync cron will refresh the Latest lessons
+     * from YouTube. Defaults true so a fresh deployment "just works". */
+    ytAutoSync: boolean
+    /** ISO timestamp of the last successful sync run. */
+    ytLastSyncAt: string | null
   }
   nav: { links: CmsLink[] }
   hero: {
@@ -236,6 +245,8 @@ export const defaultContent: CmsContent = {
     tiktokLabel: SITE.tiktokHandle,
     developerName: SITE.developerName,
     developerUrl: SITE.developerUrl,
+    ytAutoSync: true,
+    ytLastSyncAt: null,
   },
   nav: { links: NAV_LINKS.map((l) => ({ ...l })) },
   hero: {
@@ -343,6 +354,8 @@ export const defaultContent: CmsContent = {
       duration: v.duration,
       url: v.url,
       thumb: `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+      liveBroadcastContent: 'none' as const,
+      concurrentViewers: 0,
     })),
   },
   contact: {
@@ -449,6 +462,11 @@ export function validateContent(input: unknown): CmsContent | null {
       tiktokLabel: str(o.site?.tiktokLabel, d.site.tiktokLabel, 60),
       developerName: str(o.site?.developerName, d.site.developerName, 80),
       developerUrl: sanitizeUrl(o.site?.developerUrl, d.site.developerUrl),
+      ytAutoSync: bool(o.site?.ytAutoSync, d.site.ytAutoSync),
+      ytLastSyncAt:
+        typeof o.site?.ytLastSyncAt === 'string' && o.site.ytLastSyncAt.length > 0
+          ? o.site.ytLastSyncAt
+          : d.site.ytLastSyncAt,
     },
     nav: {
       links: arr(
@@ -583,7 +601,18 @@ export function validateContent(input: unknown): CmsContent | null {
             typeof v?.thumb === 'string' && v.thumb.startsWith('https://')
               ? v.thumb
               : `https://i.ytimg.com/vi/${extractYouTubeId(url) ?? extractYouTubeId(fb.url) ?? ''}/hqdefault.jpg`
-          return { title: str(v?.title, fb.title, 160), duration: str(v?.duration, fb.duration, 12), url, thumb }
+          const liveRaw = v?.liveBroadcastContent
+          const liveBroadcastContent: 'live' | 'upcoming' | 'none' =
+            liveRaw === 'live' || liveRaw === 'upcoming' ? liveRaw : 'none'
+          const concurrentViewers = num(v?.concurrentViewers, 0)
+          return {
+            title: str(v?.title, fb.title, 160),
+            duration: str(v?.duration, fb.duration, 12),
+            url,
+            thumb,
+            liveBroadcastContent,
+            concurrentViewers,
+          }
         },
         LIMITS.videos.max,
         d.community.videos,

@@ -1,10 +1,24 @@
 import { useCms } from '../cms/CmsProvider'
 import { AddItemButton, ItemControls, T } from '../cms/edit'
-import { extractYouTubeId } from '../cms/schema'
+import { extractYouTubeId, type CmsVideo } from '../cms/schema'
 import { ArrowUpRightIcon, FacebookIcon, TiktokGlyph, YoutubeIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 import { useCountUp, useInView } from '../hooks/useCountUp'
 import { useTilt } from '../hooks/useTilt'
+
+/** Split the videos array: the first currently-live item is the hero, the rest
+ * (and any non-live items in the array) populate the 4-up grid below. */
+function partitionVideos(
+  videos: CmsVideo[],
+): { live: CmsVideo | null; liveIndex: number | null; rest: CmsVideo[] } {
+  const liveIdx = videos.findIndex((v) => v.liveBroadcastContent === 'live')
+  if (liveIdx === -1) return { live: null, liveIndex: null, rest: videos }
+  return {
+    live: videos[liveIdx],
+    liveIndex: liveIdx,
+    rest: videos.filter((_, i) => i !== liveIdx),
+  }
+}
 
 function StatCard({ path, index, delay }: { path: string; index: number; delay: number }) {
   const cms = useCms()
@@ -87,6 +101,67 @@ function VideoCard({ path, index, delay }: { path: string; index: number; delay:
   )
 }
 
+function LiveHero({ path, video }: { path: string; video: CmsVideo }) {
+  const cms = useCms()
+  const thumb = video.thumb || `https://i.ytimg.com/vi/${extractYouTubeId(video.url) ?? 'default'}/hqdefault.jpg`
+  const tilt = useTilt<HTMLAnchorElement>(3)
+  const isArrayItem = path.match(/\.(\d+)$/) !== null
+  return (
+    <Reveal>
+      <a
+        ref={tilt}
+        href={video.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="cms-item group block overflow-hidden rounded-2xl border border-red-200 bg-white shadow-card transition-all duration-200 hover:border-red-300 hover:shadow-lift"
+        aria-label={`Watch "${video.title}" live on YouTube (opens in a new tab)`}
+      >
+        {isArrayItem && <ItemControls path={path} removable={cms.c.community.videos.length > 1} />}
+        <div className="flex flex-col sm:flex-row">
+          <span className="relative block aspect-video w-full shrink-0 overflow-hidden bg-navy-900 sm:aspect-auto sm:h-full sm:w-1/2">
+            <img
+              src={thumb}
+              alt=""
+              width={960}
+              height={540}
+              loading="eager"
+              decoding="async"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <span className="cms-live-badge absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-lift">
+              <span className="cms-live-dot" aria-hidden="true" />
+              Live
+            </span>
+          </span>
+          <span className="flex flex-1 flex-col gap-2 p-5 sm:p-6">
+            <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-red-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+              Streaming now
+            </span>
+            <T
+              p={`${path}.title`}
+              as="span"
+              className="block font-display text-lg font-bold leading-snug text-ink sm:text-xl"
+            />
+            <span className="text-sm text-slate-body">
+              Join the live class on YouTube. The stream link stays open in a new tab.
+            </span>
+            {video.concurrentViewers > 0 && (
+              <span className="text-xs font-semibold text-slate-body">
+                {video.concurrentViewers.toLocaleString('en-LK')} watching now
+              </span>
+            )}
+            <span className="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-red-600">
+              Watch live on YouTube
+              <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </span>
+          </span>
+        </div>
+      </a>
+    </Reveal>
+  )
+}
+
 export function Community() {
   const cms = useCms()
   const com = cms.c.community
@@ -134,14 +209,39 @@ export function Community() {
           <Reveal>
             <T p="community.videosTitle" as="h3" className="block font-display text-xl font-bold text-ink" />
           </Reveal>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {com.videos.map((_, i) => (
-              <VideoCard key={i} path={`community.videos.${i}`} index={i} delay={i * 80} />
-            ))}
-          </div>
+          {(() => {
+            const { live, liveIndex, rest } = partitionVideos(com.videos)
+            // Indices in `rest` are sparse — build an indexOf map back to the original array.
+            const originalIndices: number[] = []
+            com.videos.forEach((_v, i) => {
+              if (i !== liveIndex) originalIndices.push(i)
+            })
+            return (
+              <>
+                {live && (
+                  <div className="mt-5">
+                    <LiveHero path={`community.videos.${liveIndex!}`} video={live} />
+                  </div>
+                )}
+                <div className={`mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4`}>
+                  {rest.slice(0, 4).map((_v, i) => {
+                    const origIdx = originalIndices[i]
+                    return <VideoCard key={origIdx} path={`community.videos.${origIdx}`} index={origIdx} delay={i * 80} />
+                  })}
+                </div>
+              </>
+            )
+          })()}
           <AddItemButton
             listPath="community.videos"
-            template={{ title: 'New lesson', duration: '0:00', url: 'https://www.youtube.com/watch?v=', thumb: '' }}
+            template={{
+              title: 'New lesson',
+              duration: '0:00',
+              url: 'https://www.youtube.com/watch?v=',
+              thumb: '',
+              liveBroadcastContent: 'none',
+              concurrentViewers: 0,
+            }}
             label="Add lesson video"
           />
         </div>

@@ -116,6 +116,34 @@ function handler(root) {
       return res.end()
     }
 
+    // youtube-sync: in local dev we never call the real YouTube Data API,
+    // so this is a no-op that just bumps the timestamp on the local content.
+    if (url === '/api/youtube-sync' && (req.method === 'GET' || req.method === 'POST')) {
+      const root2 = root
+      const file2 = path.join(root2, LOCAL_FILE)
+      if (fs.existsSync(file2)) {
+        try {
+          const parsed = JSON.parse(fs.readFileSync(file2, 'utf8'))
+          if (parsed && parsed.site) {
+            parsed.site.ytLastSyncAt = new Date().toISOString()
+            fs.writeFileSync(file2, JSON.stringify(parsed, null, 2))
+          }
+        } catch {}
+      }
+      return json(res, 200, { ok: true, added: 0, removed: 0, total: 0, source: 'local-mock' })
+    }
+
+    // youtube-live: in local dev always report "not live" so the hero never
+    // appears without a real YouTube API call.
+    if (url === '/api/youtube-live' && req.method === 'GET') {
+      return json(
+        res,
+        200,
+        { id: '', liveBroadcastContent: 'none', concurrentViewers: 0 },
+        { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
+      )
+    }
+
     next()
   }
 }
