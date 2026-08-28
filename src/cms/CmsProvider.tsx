@@ -36,6 +36,9 @@ export function setPath(obj: any, path: string, value: unknown): void {
 }
 
 function deepClone<T>(v: T): T {
+  // structuredClone is the native deep-clone primitive; falls back to
+  // JSON round-trip only if the runtime lacks it (very old browsers).
+  if (typeof structuredClone === 'function') return structuredClone(v)
   return JSON.parse(JSON.stringify(v)) as T
 }
 

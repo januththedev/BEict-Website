@@ -1,21 +1,11 @@
 import { useEffect, useState } from 'react'
-import { CmsProvider, useCms, getPath, loadLocalOverrides } from '../cms/CmsProvider'
-import { validateContent, type CmsContent, type SectionId } from '../cms/schema'
-import { IconByName, ICON_REGISTRY, ArrowUpRightIcon, CloseIcon } from '../components/Icons'
-import type { IconName } from '../components/Icons'
+import { CmsProvider, useCms, loadLocalOverrides } from '../cms/CmsProvider'
+import { validateContent, type CmsContent } from '../cms/schema'
 import { Site } from '../components/Site'
-
-const SECTION_LABELS: Record<SectionId, string> = {
-  hero: 'Hero',
-  about: 'About',
-  batches: 'Batches',
-  lms: 'Online Learning',
-  promos: 'Banners',
-  community: 'Community',
-  contact: 'Contact',
-}
-
-// ---------- login ----------
+import { Toolbar } from './panels/Toolbar'
+import { SectionsPanel } from './panels/SectionsPanel'
+import { Inspector } from './panels/Inspector'
+import { SeoBrandPanel } from './panels/SeoBrandPanel'
 
 function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
   const [password, setPassword] = useState('')
@@ -34,7 +24,6 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
         body: JSON.stringify({ password }),
       })
       if (!res.ok) {
-        // No API in this environment — accept anything, use local data.
         if (res.status === 404 || res.status === 501) {
           onReady(loadLocalOverrides() ?? (validateContent({}) as CmsContent))
           return
@@ -53,8 +42,9 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
         setError(message)
         return
       }
-      const data = await fetch('/api/content', { credentials: 'include' }).then((r) => r.json())
-      const content = validateContent(data?.content)
+      const contentRes = await fetch('/api/content', { credentials: 'include' })
+      const contentData = await contentRes.json()
+      const content = validateContent(contentData?.content)
       if (!content) {
         setError('Saved content is unavailable — starting from defaults.')
         onReady(validateContent({}) as CmsContent)
@@ -62,7 +52,6 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
       }
       onReady(content)
     } catch {
-      // API unreachable — local dev mode.
       onReady(loadLocalOverrides() ?? (validateContent({}) as CmsContent))
     } finally {
       setBusy(false)
@@ -102,529 +91,6 @@ function LoginScreen({ onReady }: { onReady: (content: CmsContent) => void }) {
   )
 }
 
-// ---------- toolbar ----------
-
-function Toolbar({ onOpenSections, onOpenInspector, onOpenSeo }: { onOpenSections: () => void; onOpenInspector: () => void; onOpenSeo: () => void }) {
-  const cms = useCms()
-  const [msg, setMsg] = useState<string | null>(null)
-
-  return (
-    <div className="fixed bottom-4 left-1/2 z-[70] -translate-x-1/2">
-      <div className="flex items-center gap-1.5 rounded-full border border-white/60 bg-navy-950/90 px-3 py-2 text-xs font-semibold text-white shadow-lift backdrop-blur-xl">
-        <span className="flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-sky-300" />
-          EDIT MODE
-        </span>
-        {cms.dirty && <span className="px-1 text-amber-300">● {cms.dirty ? 'unsaved' : ''}</span>}
-        {cms.saved && !cms.dirty && <span className="px-1 text-emerald-300">published ✓</span>}
-        <button type="button" onClick={onOpenInspector} className="rounded-full px-2.5 py-1 hover:bg-white/10">
-          Fields
-        </button>
-        <button type="button" onClick={onOpenSections} className="rounded-full px-2.5 py-1 hover:bg-white/10">
-          Sections
-        </button>
-        <button type="button" onClick={onOpenSeo} className="rounded-full px-2.5 py-1 hover:bg-white/10">
-          SEO & Brand
-        </button>
-        <button
-          type="button"
-          disabled={!cms.dirty || cms.saving}
-          onClick={async () => {
-            const ok = await cms.publish()
-            setMsg(ok ? 'Published — live on the site' : 'Publish failed — session expired?')
-            setTimeout(() => setMsg(null), 3000)
-          }}
-          className="rounded-full bg-emerald-500 px-3 py-1 text-navy-950 transition-colors hover:bg-emerald-400 disabled:opacity-40"
-        >
-          {cms.saving ? 'Publishing…' : 'Publish'}
-        </button>
-        <button
-          type="button"
-          disabled={!cms.dirty}
-          onClick={() => {
-            if (window.confirm('Discard all unsaved changes?')) cms.discard()
-          }}
-          className="rounded-full px-2.5 py-1 hover:bg-white/10 disabled:opacity-40"
-        >
-          Discard
-        </button>
-        <a href="/" className="flex items-center gap-0.5 rounded-full px-2.5 py-1 hover:bg-white/10">
-          View site <ArrowUpRightIcon className="h-3 w-3" />
-        </a>
-        <button type="button" onClick={() => cms.logout()} className="rounded-full px-2.5 py-1 text-brand-200 hover:bg-white/10">
-          Logout
-        </button>
-        {msg && (
-          <span className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-4 py-1.5 text-navy-950 shadow-lift">
-            {msg}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ---------- sections panel ----------
-
-function SectionsPanel({ onClose }: { onClose: () => void }) {
-  const cms = useCms()
-  return (
-    <aside className="fixed right-0 top-0 z-[80] flex h-full w-80 flex-col border-l border-slate-200 bg-white shadow-lift">
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <h2 className="font-display text-sm font-bold uppercase tracking-wider text-ink">Sections</h2>
-        <button type="button" onClick={onClose} aria-label="Close sections panel" className="rounded-lg p-1 hover:bg-slate-100">
-          <CloseIcon className="h-4 w-4" />
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4">
-        <p className="mb-3 text-xs leading-relaxed text-slate-body">
-          Toggle visibility or reorder sections. Hidden sections keep their content — nothing is deleted.
-        </p>
-        {cms.sectionOrder.map((id, i) => (
-          <div key={id} className="mb-2 flex items-center justify-between rounded-xl border border-slate-100 bg-ice px-3 py-2.5">
-            <label className="flex items-center gap-2 text-sm font-medium text-ink">
-              <input
-                type="checkbox"
-                checked={cms.sectionVisible(id)}
-                onChange={(e) => cms.setSectionVisible(id, e.target.checked)}
-                className="h-4 w-4 accent-[var(--color-brand-600)]"
-              />
-              {SECTION_LABELS[id]}
-            </label>
-            <span className="flex gap-1">
-              <button
-                type="button"
-                title="Move up"
-                disabled={i === 0}
-                onClick={() => cms.moveSection(id, -1)}
-                className="rounded-md px-2 py-0.5 text-xs hover:bg-white disabled:opacity-30"
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                title="Move down"
-                disabled={i === cms.sectionOrder.length - 1}
-                onClick={() => cms.moveSection(id, 1)}
-                className="rounded-md px-2 py-0.5 text-xs hover:bg-white disabled:opacity-30"
-              >
-                ↓
-              </button>
-              <button
-                type="button"
-                title="Reset this section to defaults"
-                onClick={() => {
-                  if (window.confirm(`Reset "${SECTION_LABELS[id]}" to the original content?`)) cms.resetSection(id)
-                }}
-                className="rounded-md px-2 py-0.5 text-xs hover:bg-white"
-              >
-                ↺
-              </button>
-            </span>
-          </div>
-        ))}
-      </div>
-    </aside>
-  )
-}
-
-// ---------- inspector (generic field editor) ----------
-
-function FieldRow({ path, value }: { path: string; value: unknown }) {
-  const cms = useCms()
-  const key = path.split('.').pop() ?? ''
-  const isLong = typeof value === 'string' && value.length > 60
-  const isUrl = /href|url|link|image|thumb/i.test(key)
-  const isIcon = key === 'icon'
-  const isNum = typeof value === 'number'
-
-  if (isIcon) {
-    return (
-      <label className="block">
-        <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">icon</span>
-        <span className="flex flex-wrap gap-1">
-          {(Object.keys(ICON_REGISTRY) as IconName[]).map((name) => (
-            <button
-              key={name}
-              type="button"
-              title={ICON_REGISTRY[name].label}
-              onClick={() => cms.set(path, name)}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border ${
-                value === name ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-200 text-slate-body hover:bg-brand-50'
-              }`}
-            >
-              <IconByName name={name} className="h-4 w-4" />
-            </button>
-          ))}
-        </span>
-      </label>
-    )
-  }
-
-  if (isNum) {
-    return (
-      <label className="block">
-        <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">{key} (number)</span>
-        <input
-          type="number"
-          value={Number(value)}
-          onChange={(e) => cms.set(path, Number(e.target.value))}
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-        />
-      </label>
-    )
-  }
-
-  if (typeof value !== 'string') return null
-
-  return (
-    <label className="block">
-      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">{key}</span>
-      {isLong || key === 'body' || key.includes('lede') || key.includes('blurb') || key.includes('P1') || key.includes('P2') || key.includes('desc') || key.includes('note') ? (
-        <textarea
-          value={value}
-          rows={3}
-          onChange={(e) => cms.set(path, e.target.value)}
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-        />
-      ) : (
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => cms.set(path, e.target.value)}
-          inputMode={isUrl ? 'url' : undefined}
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-        />
-      )}
-      {isUrl && <span className="mt-0.5 block text-[10px] text-slate-body">https:// · tel: · mailto: links only</span>}
-    </label>
-  )
-}
-
-function Inspector({ onClose }: { onClose: () => void }) {
-  const cms = useCms()
-  const sel = cms.selected
-  const item = sel ? (getPath(cms.c, sel) as Record<string, unknown> | undefined) : undefined
-
-  return (
-    <aside className="fixed right-0 top-0 z-[80] flex h-full w-80 flex-col border-l border-slate-200 bg-white shadow-lift">
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <h2 className="font-display text-sm font-bold uppercase tracking-wider text-ink">Fields</h2>
-        <button type="button" onClick={onClose} aria-label="Close fields panel" className="rounded-lg p-1 hover:bg-slate-100">
-          <CloseIcon className="h-4 w-4" />
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4">
-        {!sel && (
-          <p className="text-xs leading-relaxed text-slate-body">
-            Click any text on the page to edit it inline and select it here. Items (cards, videos, stats…) show all
-            of their fields in this panel — including links, icons and images.
-          </p>
-        )}
-        {sel && !item && <p className="text-xs text-slate-body">Nothing selected.</p>}
-        {sel &&
-          item &&
-          typeof item === 'object' &&
-          Object.entries(item).map(([k, v]) =>
-            typeof v === 'object' && v !== null && !Array.isArray(v) ? (
-              <div key={k} className="mb-4 rounded-xl border border-slate-100 bg-ice p-3">
-                <p className="mb-2 font-display text-xs font-bold uppercase tracking-wide text-ink">{k}</p>
-                <div className="grid gap-3">
-                  {Object.entries(v as Record<string, unknown>).map(([k2, v2]) =>
-                    typeof v2 !== 'object' ? <FieldRow key={k2} path={`${sel}.${k}.${k2}`} value={v2} /> : null,
-                  )}
-                </div>
-              </div>
-            ) : Array.isArray(v) ? (
-              <p key={k} className="mb-3 text-[11px] text-slate-body">
-                “{k}” list — use the ↑ ↓ ⧉ ✕ controls on the page.
-              </p>
-            ) : (
-              <div key={k} className="mb-3">
-                <FieldRow path={`${sel}.${k}`} value={v} />
-              </div>
-            ),
-          )}
-        {sel && item && (
-          <button
-            type="button"
-            onClick={() => cms.select(null)}
-            className="mt-2 w-full rounded-full border border-slate-200 py-2 text-xs font-semibold text-slate-body hover:bg-slate-50"
-          >
-            Deselect
-          </button>
-        )}
-      </div>
-    </aside>
-  )
-}
-
-// ---------- SEO & brand panel ----------
-
-function UploadButton({
-  accept,
-  label,
-  fieldKey,
-  disabled,
-  onUploaded,
-}: {
-  accept: string
-  label: string
-  fieldKey: string
-  /** When true, the button shows a "Replace" state. When false, it shows "Upload". */
-  disabled?: boolean
-  onUploaded: (url: string) => void
-}) {
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState(false)
-  const inputId = `upload-${fieldKey}`
-
-  return (
-    <div className="mt-2 flex items-center gap-2">
-      <input
-        id={inputId}
-        type="file"
-        accept={accept}
-        className="hidden"
-        onChange={async (e) => {
-          const file = e.target.files?.[0]
-          e.target.value = ''
-          if (!file) return
-          setBusy(true)
-          setError(null)
-          setDone(false)
-          try {
-            const fd = new FormData()
-            fd.append('file', file)
-            const res = await fetch('/api/upload', {
-              method: 'POST',
-              credentials: 'include',
-              body: fd,
-            })
-            if (!res.ok) {
-              const data = (await res.json().catch(() => ({}))) as { error?: string }
-              throw new Error(data.error || `Upload failed (${res.status})`)
-            }
-            const data = (await res.json()) as { url?: string }
-            if (!data.url) throw new Error('Upload succeeded but no URL returned')
-            onUploaded(data.url)
-            setDone(true)
-            setTimeout(() => setDone(false), 2500)
-          } catch (err) {
-            setError(err instanceof Error ? err.message : 'Upload failed')
-          } finally {
-            setBusy(false)
-          }
-        }}
-      />
-      <label
-        htmlFor={inputId}
-        className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
-          busy
-            ? 'pointer-events-none border-slate-200 bg-slate-50 text-slate-body'
-            : 'border-brand-200 bg-white text-brand-700 hover:border-brand-400 hover:bg-brand-50'
-        }`}
-      >
-        {busy ? (
-          <>
-            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-brand-300 border-t-brand-600" />
-            Uploading…
-          </>
-        ) : (
-          <>
-            <span aria-hidden="true">↑</span>
-            {disabled ? 'Replace' : 'Upload'}
-          </>
-        )}
-      </label>
-      <span className="text-[10px] text-slate-body">
-        {done ? (
-          <span className="font-semibold text-emerald-600">✓ Uploaded</span>
-        ) : error ? (
-          <span className="font-semibold text-red-600">{error}</span>
-        ) : (
-          label
-        )}
-      </span>
-    </div>
-  )
-}
-
-// ---------- SEO & brand panel ----------
-
-function SeoBrandPanel({ onClose }: { onClose: () => void }) {
-  const cms = useCms()
-  const site = cms.c.site
-
-  return (
-    <aside className="fixed right-0 top-0 z-[80] flex h-full w-96 flex-col border-l border-slate-200 bg-white shadow-lift">
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <h2 className="font-display text-sm font-bold uppercase tracking-wider text-ink">SEO &amp; Brand</h2>
-        <button type="button" onClick={onClose} aria-label="Close SEO & brand panel" className="rounded-lg p-1 hover:bg-slate-100">
-          <CloseIcon className="h-4 w-4" />
-        </button>
-      </div>
-      <div className="flex-1 overflow-y-auto p-5">
-        <p className="mb-4 text-xs leading-relaxed text-slate-body">
-          These update the browser tab title, search-engine description, social-share image, and the favicon — live on the published site, no rebuild required.
-        </p>
-
-        <label className="mb-4 block">
-          <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">Site title (browser tab)</span>
-          <input
-            type="text"
-            value={site.seoTitle}
-            onChange={(e) => cms.set('site.seoTitle', e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-          />
-        </label>
-
-        <label className="mb-4 block">
-          <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">Site description (meta + social)</span>
-          <textarea
-            value={site.seoDescription}
-            rows={3}
-            onChange={(e) => cms.set('site.seoDescription', e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-          />
-          <span className="mt-0.5 block text-[10px] text-slate-body">{site.seoDescription.length} / 500</span>
-        </label>
-
-        <div className="mb-4 rounded-xl border border-slate-100 bg-ice p-3">
-          <label className="mb-2 block">
-            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">Favicon URL</span>
-            <input
-              type="text"
-              value={site.seoFaviconUrl}
-              inputMode="url"
-              onChange={(e) => cms.set('site.seoFaviconUrl', e.target.value)}
-              placeholder="https://… or /favicon.svg"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-            />
-            <span className="mt-0.5 block text-[10px] text-slate-body">.svg or .png · appears next to the browser tab title</span>
-          </label>
-          <UploadButton
-            accept="image/svg+xml,image/png,image/x-icon,image/vnd.microsoft.icon"
-            label="Upload favicon"
-            fieldKey="favicon"
-            disabled={!site.seoFaviconUrl}
-            onUploaded={(url) => cms.set('site.seoFaviconUrl', url)}
-          />
-          {site.seoFaviconUrl && (
-            <div className="mt-2 flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3">
-              <img src={site.seoFaviconUrl} alt="favicon preview" className="h-8 w-8 rounded" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-ink">{site.seoTitle || 'BEICT'}</p>
-                <p className="truncate text-[10px] text-slate-body">in browser tab</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="mb-4 rounded-xl border border-slate-100 bg-ice p-3">
-          <label className="mb-2 block">
-            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-body">Social share image (Open Graph)</span>
-            <input
-              type="text"
-              value={site.seoOgImageUrl}
-              inputMode="url"
-              onChange={(e) => cms.set('site.seoOgImageUrl', e.target.value)}
-              placeholder="https://… or /og-image.svg"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-            />
-            <span className="mt-0.5 block text-[10px] text-slate-body">1200×630 recommended · shown when the site is shared on Facebook / WhatsApp / etc.</span>
-          </label>
-          <UploadButton
-            accept="image/png,image/jpeg,image/webp"
-            label="Upload OG image"
-            fieldKey="og"
-            disabled={!site.seoOgImageUrl}
-            onUploaded={(url) => cms.set('site.seoOgImageUrl', url)}
-          />
-          {site.seoOgImageUrl && (
-            <div className="mt-2 overflow-hidden rounded-lg border border-slate-200 bg-white">
-              <img src={site.seoOgImageUrl} alt="og:image preview" className="aspect-[1200/630] w-full object-cover" />
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-xl border border-slate-100 bg-ice p-3">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-body">Latest lessons feed</p>
-          <label className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              checked={Boolean(site.ytAutoSync)}
-              onChange={(e) => cms.set('site.ytAutoSync', e.target.checked)}
-              className="mt-1 h-4 w-4 accent-[var(--color-brand-600)]"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-ink">Auto-update from YouTube</span>
-              <span className="mt-0.5 block text-[11px] leading-snug text-slate-body">
-                When on, the latest 6 lessons refresh automatically from YouTube every 6 hours — no admin needed. Turn off to manage the lesson list manually.
-              </span>
-            </span>
-          </label>
-          {site.ytLastSyncAt && (
-            <p className="mt-2 text-[10px] text-slate-body">Last sync: {new Date(site.ytLastSyncAt).toLocaleString()}</p>
-          )}
-        </div>
-      </div>
-    </aside>
-  )
-}
-
-// ---------- root ----------
-
-export default function AdminApp() {
-  const [state, setState] = useState<'checking' | 'login' | 'ready'>('checking')
-  const [initial, setInitial] = useState<CmsContent | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/content', { credentials: 'include' })
-      .then(async (r) => {
-        if (!r.ok) throw new Error(String(r.status))
-        return r.json()
-      })
-      .then((data) => {
-        if (cancelled) return
-        const content = validateContent(data?.content)
-        if (data?.authed && content) {
-          setInitial(content)
-          setState('ready')
-        } else {
-          setState('login')
-        }
-      })
-      .catch(() => {
-        // No API (local dev) — allow local editing with localStorage persistence.
-        if (!cancelled) setState('login')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  if (state === 'checking') return null
-
-  if (state === 'login') {
-    return (
-      <LoginScreen
-        onReady={(content) => {
-          setInitial(content)
-          setState('ready')
-        }}
-      />
-    )}
-
-  return (
-    <CmsProvider edit initialContent={initial ?? undefined}>
-      <AdminChrome />
-    </CmsProvider>
-  )
-}
-
 function AdminChrome() {
   const cms = useCms()
   const [panel, setPanel] = useState<'none' | 'sections' | 'inspector' | 'seo'>('none')
@@ -655,5 +121,54 @@ function AdminChrome() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function AdminApp() {
+  const [state, setState] = useState<'checking' | 'login' | 'ready'>('checking')
+  const [initial, setInitial] = useState<CmsContent | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch('/api/content', { credentials: 'include' })
+        if (!res.ok) throw new Error(String(res.status))
+        const data = (await res.json()) as { authed?: boolean; content?: unknown }
+        if (cancelled) return
+        const content = validateContent(data?.content)
+        if (data?.authed && content) {
+          setInitial(content)
+          setState('ready')
+        } else {
+          setState('login')
+        }
+      } catch {
+        if (!cancelled) setState('login')
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (state === 'checking') return null
+
+  if (state === 'login') {
+    return (
+      <LoginScreen
+        onReady={(content) => {
+          setInitial(content)
+          setState('ready')
+        }}
+      />
+    )
+  }
+
+  return (
+    <CmsProvider edit initialContent={initial ?? undefined}>
+      <AdminChrome />
+    </CmsProvider>
   )
 }

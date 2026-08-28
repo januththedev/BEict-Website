@@ -1,5 +1,6 @@
 import { passwordMatches, sessionCookie, clientIp } from '../src/cms/server/session.js'
 import { checkLoginThrottle } from '../src/cms/server/db.js'
+import { isSameOrigin } from '../src/cms/server/csrf.js'
 
 function json(body: unknown, status = 200, extraHeaders: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -15,6 +16,10 @@ export default {
     try {
       if (!process.env.ADMIN_PASSWORD) {
         return json({ error: 'ADMIN_PASSWORD is not configured — add it in Vercel and redeploy' }, 500)
+      }
+
+      if (!isSameOrigin(req)) {
+        return json({ error: 'Cross-origin request blocked' }, 403)
       }
 
       const ip = clientIp(req)

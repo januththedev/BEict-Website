@@ -2,6 +2,7 @@ import { put } from '@vercel/blob'
 import { isAuthed } from '../src/cms/server/session.js'
 import { loadContent, saveContent, getSql } from '../src/cms/server/db.js'
 import { validateContent } from '../src/cms/schema.js'
+import { isSameOrigin } from '../src/cms/server/csrf.js'
 
 const CONTENT_PATH = 'cms/content.json'
 
@@ -49,6 +50,9 @@ export default {
       try {
         if (!(await isAuthed(req))) {
           return json({ error: 'Unauthorized' }, 401)
+        }
+        if (!isSameOrigin(req)) {
+          return json({ error: 'Cross-origin request blocked' }, 403)
         }
 
         let payload: { content?: unknown }
