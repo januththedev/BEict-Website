@@ -123,6 +123,11 @@ export interface CmsContent {
     ytAutoSync: boolean
     /** ISO timestamp of the last successful sync run. */
     ytLastSyncAt: string | null
+    /** SEO & brand identity (editable in the admin SEO & Brand section). */
+    seoTitle: string
+    seoDescription: string
+    seoFaviconUrl: string
+    seoOgImageUrl: string
   }
   nav: { links: CmsLink[] }
   hero: {
@@ -247,6 +252,11 @@ export const defaultContent: CmsContent = {
     developerUrl: SITE.developerUrl,
     ytAutoSync: true,
     ytLastSyncAt: null,
+    seoTitle: `${SITE.name} — ${SITE.level} ${SITE.subject} in Sinhala medium`,
+    seoDescription:
+      'BEICT — Bhanuka Ekanayaka ICT. G.C.E. Advanced Level ICT classes in Sinhala medium, plus the BEICT online learning system at lms.beict.lk.',
+    seoFaviconUrl: '/favicon.svg',
+    seoOgImageUrl: '/og-image.svg',
   },
   nav: { links: NAV_LINKS.map((l) => ({ ...l })) },
   hero: {
@@ -467,6 +477,10 @@ export function validateContent(input: unknown): CmsContent | null {
         typeof o.site?.ytLastSyncAt === 'string' && o.site.ytLastSyncAt.length > 0
           ? o.site.ytLastSyncAt
           : d.site.ytLastSyncAt,
+      seoTitle: str(o.site?.seoTitle, d.site.seoTitle, 200),
+      seoDescription: str(o.site?.seoDescription, d.site.seoDescription, 500),
+      seoFaviconUrl: sanitizeUrl(o.site?.seoFaviconUrl, d.site.seoFaviconUrl),
+      seoOgImageUrl: sanitizeUrl(o.site?.seoOgImageUrl, d.site.seoOgImageUrl),
     },
     nav: {
       links: arr(

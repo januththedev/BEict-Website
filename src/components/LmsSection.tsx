@@ -1,5 +1,5 @@
 import { useCms } from '../cms/CmsProvider'
-import { AddItemButton, ItemControls, T } from '../cms/edit'
+import { AddItemButton, ItemControls, Link, T } from '../cms/edit'
 import { ArrowUpRightIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 
@@ -39,16 +39,16 @@ export function LmsSection() {
               <T p="lms.sinhala" as="p" className="block font-sinhala text-lg leading-relaxed text-brand-100" />
             </Reveal>
             <Reveal delay={200} className="flex flex-wrap items-center gap-4">
-              <a
-                href={cms.c.site.lmsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                hrefPath="site.lmsUrl"
+                fallback={cms.c.site.lmsUrl}
+                external
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-brand-700 shadow-lift transition-all hover:-translate-y-0.5 hover:bg-brand-50 active:translate-y-0"
               >
                 <T p="lms.ctaLabel" />
                 <ArrowUpRightIcon className="h-4 w-4" />
                 <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
-              </a>
+              </Link>
               <span className="font-mono text-sm text-brand-200">lms.beict.lk</span>
             </Reveal>
           </div>

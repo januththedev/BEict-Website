@@ -1,5 +1,5 @@
 import { useCms } from '../cms/CmsProvider'
-import { AddItemButton, EditableIcon, ItemControls, T } from '../cms/edit'
+import { AddItemButton, EditableIcon, ItemControls, Link, T } from '../cms/edit'
 import { ArrowUpRightIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 import { useTilt } from '../hooks/useTilt'
@@ -23,16 +23,16 @@ function BatchCard({ path, index }: { path: string; index: number }) {
           <T p={`${path}.name`} as="h3" className="font-display text-lg font-bold text-ink" />
           <T p={`${path}.note`} as="p" multiline className="mt-2 block text-sm leading-relaxed" />
         </div>
-        <a
-          href={cms.c.site.lmsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          hrefPath="site.lmsUrl"
+          fallback={cms.c.site.lmsUrl}
+          external
           className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-brand-700 transition-colors hover:text-brand-600"
         >
           {cms.c.batches.cardLinkLabel}
           <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
-        </a>
+        </Link>
       </article>
     </Reveal>
   )
@@ -68,9 +68,14 @@ export function Batches() {
         <Reveal delay={280}>
           <p className="mt-8 text-center text-xs text-slate-body">
             <T p="batches.captionPre" />{' '}
-            <a href={cms.c.site.lmsUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600">
+            <Link
+              hrefPath="site.lmsUrl"
+              fallback={cms.c.site.lmsUrl}
+              external
+              className="font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600"
+            >
               <T p="batches.captionLinkLabel" />
-            </a>
+            </Link>
             . Current availability is confirmed inside the learning system.
           </p>
         </Reveal>

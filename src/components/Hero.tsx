@@ -1,5 +1,5 @@
 import { useCms } from '../cms/CmsProvider'
-import { T } from '../cms/edit'
+import { Link, T } from '../cms/edit'
 import { ArrowUpRightIcon } from './Icons'
 import { HeroCanvas } from './HeroCanvas'
 import { BlurIn, TextReveal } from './TextReveal'
@@ -111,18 +111,27 @@ export function Hero() {
 
               <BlurIn as="p" delay={950} className="mt-5 max-w-xl text-lg leading-relaxed text-slate-body">
                 <T p="hero.ledePre" />{' '}
-                <a href={h.ledeLinkHref} target="_blank" rel="noopener noreferrer" className="font-semibold text-ink">
-                  <T p="hero.ledeLinkLabel" />
-                </a>
+                <Link
+                  hrefPath="hero.ledeLinkHref"
+                  labelPath="hero.ledeLinkLabel"
+                  fallback={h.ledeLinkHref}
+                  external
+                  className="font-semibold text-ink"
+                />
                 {h.ledePost ? <> {<T p="hero.ledePost" />}</> : null}
               </BlurIn>
 
               <BlurIn delay={1150} className="mt-7 flex flex-wrap items-center gap-3">
-                <a href={h.primaryCta.href} target="_blank" rel="noopener noreferrer" className={btnPrimary}>
-                  {edit ? <T p="hero.primaryCta.label" /> : h.primaryCta.label}
+                <Link
+                  hrefPath="hero.primaryCta.href"
+                  labelPath="hero.primaryCta.label"
+                  fallback={h.primaryCta.href}
+                  external
+                  className={btnPrimary}
+                >
                   <ArrowUpRightIcon className="h-4 w-4" />
                   <span className="sr-only">(opens in a new tab)</span>
-                </a>
+                </Link>
                 <a href="#contact" className={btnGhost}>
                   {edit ? <T p="hero.secondaryCtaLabel" /> : h.secondaryCtaLabel}
                 </a>

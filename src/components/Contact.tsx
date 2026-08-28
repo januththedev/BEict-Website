@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useCms } from '../cms/CmsProvider'
-import { EditableIcon, T } from '../cms/edit'
+import { EditableIcon, Link, T } from '../cms/edit'
 import { ChatIcon, SendIcon } from './Icons'
 import { Reveal, SectionHeading } from './ui'
 
@@ -61,19 +61,23 @@ export function Contact() {
                 </span>
                 <div>
                   <T p="contact.call.title" as="h3" className="block text-xs font-semibold uppercase tracking-wider text-slate-body" />
-                  <a href={ct.call.phoneHref} className="mt-1 block font-semibold text-ink transition-colors hover:text-brand-700">
+                  <Link
+                    hrefPath="contact.call.phoneHref"
+                    fallback={ct.call.phoneHref}
+                    className="mt-1 block font-semibold text-ink transition-colors hover:text-brand-700"
+                  >
                     <T p="contact.call.phoneDisplay" />
-                  </a>
-                  <a
-                    href={ct.call.whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  </Link>
+                  <Link
+                    hrefPath="contact.call.whatsappHref"
+                    fallback={ct.call.whatsappHref}
+                    external
                     className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:text-brand-600"
                   >
                     <ChatIcon className="h-3.5 w-3.5" />
                     <T p="contact.call.whatsappLabel" />
                     <span className="sr-only">(opens WhatsApp in a new tab)</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </Reveal>
@@ -85,9 +89,13 @@ export function Contact() {
                 </span>
                 <div>
                   <T p="contact.email.title" as="h3" className="block text-xs font-semibold uppercase tracking-wider text-slate-body" />
-                  <a href={`mailto:${ct.email.email}`} className="mt-1 block font-semibold text-ink transition-colors hover:text-brand-700">
+                  <Link
+                    hrefPath="contact.email.email"
+                    fallback={`mailto:${ct.email.email}`}
+                    className="mt-1 block font-semibold text-ink transition-colors hover:text-brand-700"
+                  >
                     <T p="contact.email.email" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             </Reveal>

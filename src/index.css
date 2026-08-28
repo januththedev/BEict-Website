@@ -468,3 +468,113 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- CMS Link primitive (admin only) ---- */
+.edit-on .cms-link {
+  position: relative;
+  display: inline;
+}
+
+.edit-on .cms-link-anchor {
+  position: relative;
+  outline: 1px dashed transparent;
+  outline-offset: 3px;
+  border-radius: 3px;
+  transition:
+    outline-color 0.12s,
+    background 0.12s;
+}
+
+.edit-on .cms-link-anchor:hover {
+  outline-color: var(--color-brand-400, #fb923c);
+  background: color-mix(in oklab, var(--color-brand-50) 70%, transparent);
+}
+
+.edit-on .cms-link-anchor.cms-link-missing {
+  outline: 1px dashed #f87171;
+  background: rgba(254, 226, 226, 0.5);
+}
+
+.edit-on .cms-link-anchor.cms-selected {
+  outline: 2px solid var(--color-brand-600, #ea580c);
+  background: color-mix(in oklab, var(--color-brand-100) 60%, transparent);
+}
+
+.edit-on .cms-link-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  max-width: 90vw;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+  font-size: 12px;
+  color: var(--color-ink, #0f172a);
+}
+
+.edit-on .cms-link-pop-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--color-brand-700, #c2410c);
+}
+
+.edit-on .cms-link-pop-spacer {
+  flex: 1;
+}
+
+.edit-on .cms-link-pop-x {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.edit-on .cms-link-pop-x:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.edit-on .cms-link-pop-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+/* ---- CMS image URL popover (admin only) ---- */
+.edit-on .cms-img-url-pop {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCms } from '../cms/CmsProvider'
+import { Link } from '../cms/edit'
 import { Logo } from './Logo'
 import { ArrowUpRightIcon, CloseIcon, MenuIcon } from './Icons'
 
@@ -43,12 +44,6 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [open])
 
-  const lmsLinkProps = {
-    href: c.site.lmsUrl,
-    target: '_blank',
-    rel: 'noopener noreferrer',
-  } as const
-
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-2.5 sm:px-6 sm:pt-3">
       <div className="mx-auto max-w-6xl">
@@ -64,31 +59,33 @@ export function Navbar() {
           </a>
 
           <nav className="hidden items-center gap-5 lg:flex" aria-label="Primary">
-            {c.nav.links.map((link) => (
-              <a
+            {c.nav.links.map((link, i) => (
+              <Link
                 key={link.href + link.label}
-                href={link.href}
-                aria-current={activeHref === link.href ? 'true' : undefined}
+                hrefPath={`nav.links.${i}.href`}
+                labelPath={`nav.links.${i}.label`}
+                fallback={link.href}
+                item={`nav.links.${i}`}
                 className={`relative text-[13px] font-medium transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:rounded-full after:bg-brand-600 after:transition-all ${
                   activeHref === link.href
                     ? 'text-brand-700 after:w-full'
                     : 'text-slate-body after:w-0 hover:text-brand-700'
                 }`}
-              >
-                {link.label}
-              </a>
+              />
             ))}
           </nav>
 
           <div className="flex items-center gap-1.5">
-            <a
-              {...lmsLinkProps}
+            <Link
+              hrefPath="site.lmsUrl"
+              fallback={c.site.lmsUrl}
+              external
               className="hidden items-center gap-1 rounded-full bg-brand-600 px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-card transition-all hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift active:translate-y-0 sm:inline-flex"
             >
               {c.site.lmsLabel}
               <ArrowUpRightIcon className="h-3.5 w-3.5" />
               <span className="sr-only">(opens lms.beict.lk in a new tab)</span>
-            </a>
+            </Link>
             <button
               type="button"
               className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-ink transition-colors hover:bg-brand-50 lg:hidden"
@@ -108,29 +105,31 @@ export function Navbar() {
             className="mt-2 rounded-3xl border border-white/50 bg-white/70 p-2 shadow-lift backdrop-blur-2xl backdrop-saturate-150 lg:hidden"
           >
             <nav className="flex flex-col gap-0.5" aria-label="Mobile">
-              {c.nav.links.map((link) => (
-                <a
+              {c.nav.links.map((link, i) => (
+                <Link
                   key={link.href + link.label}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
+                  hrefPath={`nav.links.${i}.href`}
+                  labelPath={`nav.links.${i}.label`}
+                  fallback={link.href}
+                  item={`nav.links.${i}`}
                   className={`rounded-2xl px-4 py-2.5 text-[15px] font-medium transition-colors ${
                     activeHref === link.href
                       ? 'bg-brand-50 text-brand-700'
                       : 'text-ink hover:bg-brand-50 hover:text-brand-700'
                   }`}
-                >
-                  {link.label}
-                </a>
+                />
               ))}
-              <a
-                {...lmsLinkProps}
+              <Link
+                hrefPath="site.lmsUrl"
+                fallback={c.site.lmsUrl}
+                external
                 className="mt-1 inline-flex items-center justify-between rounded-2xl bg-brand-600 px-4 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-brand-700"
               >
                 <span>{c.site.lmsLabel}</span>
                 <span className="flex items-center gap-1 text-[13px] font-medium text-brand-100">
                   lms.beict.lk <ArrowUpRightIcon className="h-4 w-4" />
                 </span>
-              </a>
+              </Link>
             </nav>
           </div>
         )}
