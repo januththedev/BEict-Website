@@ -37,11 +37,12 @@ export default {
         console.error('[cms] content GET read failed:', err)
         content = null
       }
-      return json(
-        { authed, content },
-        200,
-        { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=60' },
-      )
+      // Authed reads must never be shared-cached (cookie-bound); unauthed reads
+      // get a short public cache so the public site stays cheap.
+      const cacheHeaders = authed
+        ? { 'Cache-Control': 'private, no-store', Vary: 'Cookie' }
+        : { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=60', Vary: 'Cookie' }
+      return json({ authed, content }, 200, cacheHeaders)
     }
 
     if (req.method === 'PUT') {
